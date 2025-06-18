@@ -14,8 +14,9 @@
 - [x] 0.3 Configure branch-naming convention (`feat/`, `fix/`, `docs/`, etc.) and PR template (deprecated – user opted out)
 
 ## 1  Development Environment
-- [ ] 1.1 Create **Python 3.10** virtual‐environment bootstrap script (`scripts/setup_env.ps1`).
-- [ ] 1.2 Pin all core dependencies and generate `requirements.txt` via `pip-compile`.
+- [x] 1.1 Create **Python 3.10** virtual‐environment bootstrap script (`scripts/setup_env.ps1`). (commit: initial setup)
+- [x] 1.2 Pin all core dependencies and generate `requirements.txt` via `pip-compile`. (commit: initial setup)
+> NOTE: Initial plan to use `NVIDIA/Parakeet` via `nemo_toolkit` was blocked; `triton` dependency is not Windows-compatible. Pivoted to `openai/whisper`.
 - [ ] 1.3 Write smoke test verifying PyTorch can see CUDA (`python scripts/check_cuda.py`).
 - [ ] 1.4 Document environment setup in `README.md` (dev section).
 
