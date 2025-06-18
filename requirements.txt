@@ -125,4 +125,6 @@ yarg==0.1.10
 # setuptools
 
 # NVIDIA NeMo toolkit for Parakeet ASR model
-nemo_toolkit[asr]==1.23.0
+# nemo_toolkit[asr]==1.23.0
+#->#
+# nemo_toolkit[asr]==1.23.0  # TODO: install manually in WSL/Linux or when Windows wheel is available
