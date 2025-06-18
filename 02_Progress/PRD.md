@@ -105,6 +105,7 @@ The user has direct control over the application's VRAM footprint without exitin
 - **FR-4.1.1:** On every launch, the application MUST programmatically check for a compatible NVIDIA driver by executing `nvidia-smi` and parsing the output.
 - **FR-4.1.2:** It MUST also verify that PyTorch can access a usable CUDA environment via `torch.cuda.is_available()`.
 - **FR-4.1.3:** If these checks fail, the application MUST display a user-friendly notification guiding them to the NVIDIA driver download page.
+- **FR-4.1.4:** The application MUST terminate immediately after displaying the notification; CPU-only operation is explicitly unsupported.
 
 4.2. THE "NEVER LOSE A WORD" GUARANTEE
 - **FR-4.2.1:** From the moment recording starts, the application MUST continuously spool the raw audio stream into small, sequentially numbered temporary files in a hidden application data directory.

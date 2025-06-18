@@ -18,6 +18,7 @@
 - [x] 1.2 Pin all core dependencies and generate `requirements.txt` via `pip-compile`. (commit: c254f81)
 - [x] 1.3 Write smoke test verifying PyTorch can see CUDA (`python scripts/check_cuda.py`). (commit: 3eeee16)
 - [x] 1.4 Document environment setup in `README.md` (dev section). (commit: c254f81)
+- [ ] 1.5 Enforce GPU presence at startup – application exits with error if `torch.cuda.is_available()` is False.
 
 ## 2  Logging & Configuration Framework
 - [ ] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`).

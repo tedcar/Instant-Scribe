@@ -24,7 +24,7 @@ idx = torch.cuda.current_device()
 props = torch.cuda.get_device_properties(idx)
 print(textwrap.dedent(
     f"""
-    ✅ CUDA is available!
+    CUDA is available!
        • Device index : {idx}
        • Name         : {props.name}
        • Total VRAM   : {props.total_memory / 1e9:.2f} GB
