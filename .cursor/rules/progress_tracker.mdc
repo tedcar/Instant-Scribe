@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Progress Tracker Rule – keeps DEV_TASKS.md in sync
+
+- **Maintain Task Progress**
+  - Each entry in `DEV_TASKS.md` MUST be written as a Markdown checklist item using `[ ]` (open) or `[x]` (done).
+  - After a commit/PR fulfils a task, mark it `[x]` and append the commit hash or PR link on the same line.
+  - NEVER delete completed tasks; historical context is valuable.  If a task becomes obsolete, prefix it with `[x]` and add "(deprecated)" suffix with reason.
+
+- **Sync With Product Docs**
+  - When the PRD or Blueprint change in scope or direction, update `DEV_TASKS.md` in the same pull-request.
+  - Conversely, if new tasks are added or existing ones are re-scoped, ensure corresponding updates are reflected in `02_Progress/PRD.md`.
+
+- **Usage Guidance for Future Contributors**
+  - Before beginning work, scan for the first unchecked task and reference its number in your branch name (`feat/4.2-vad-state-machine`).
+  - Automated CI MUST fail if a PR modifies code **without** updating the task list when applicable.
+  - New functionality not covered by an existing task warrants adding a new task under an existing or new section.
+
+- **Rule Enforcement Examples**
+  ```markdown
+  - [ ] 4.2 Integrate WebRTC VAD state machine  ⇠ open task
+  - [x] 1.2 Pin all core dependencies (PR #12)  ⇠ completed task
+  - [x] 6.4 Handle CUDA OOM gracefully (deprecated – handled upstream by NeMo 1.25)
+  ```
+
+- **Cross-Tooling**
+  - CI scripts are encouraged to parse checkbox status to generate progress metrics.
+  - IDE assistants (including this AI) SHOULD consult `DEV_TASKS.md` before proposing new code edits.
+
+- **AI Enforcement**
+  - Cursor assistants MUST review `DEV_TASKS.md` and update it (mark tasks complete/deprecated or add new ones) BEFORE finalising any response involving code or documentation changes.
+
+
+
+
+
+
