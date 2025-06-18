@@ -116,6 +116,39 @@
 - [ ] 20.2 Create `docs/TROUBLESHOOTING.md` covering common GPU/driver issues.
 - [ ] 20.3 Generate architecture diagram (`docs/diagram.mmd`) using Mermaid.
 
+## 21  Background Batch Transcription
+- [ ] 21.1 Implement `batch_transcriber.py` consuming 10-minute audio slices in parallel during recording.
+- [ ] 21.2 Merge partial transcriptions on recording stop and maintain correct order.
+- [ ] 21.3 Expose batch length & overlap to `ConfigManager`.
+- [ ] 21.4 Integration test: 30-min dummy recording returns text in < 3 s.
+
+## 22  Silence Removal Pre-Processor
+- [ ] 22.1 Add `silence_pruner.py` that trims > 2 min silence segments prior to transcription.
+- [ ] 22.2 User-configurable silence threshold via config.
+- [ ] 22.3 Unit test ensuring trimmed output length ≤ input length ‑ 2 min silence.
+
+## 23  Clipboard Robustness
+- [ ] 23.1 Create `clipboard_manager.py` with `copy_with_verification()` and retry logic.
+- [ ] 23.2 Fallback: write `.txt` file named after first 7 words if copy fails.
+- [ ] 23.3 Stress test: copy 1 billion-char string to ensure no crash.
+- [ ] 23.4 Integration test: simulate clipboard access denial.
+
+## 24  Enhanced Recording Spooler
+- [ ] 24.1 Configure spooler chunk interval to 60 s default, value in config.
+- [ ] 24.2 Implement chunk merge utility for recovery workflow.
+- [ ] 24.3 Unit test merge of 120 sequential PCM chunks.
+
+## 25  Pause & Resume Workflow
+- [ ] 25.1 Bind `Ctrl+Alt+C` hotkey in `hotkey_manager.py` to toggle pause state.
+- [ ] 25.2 Persist pause state in config/state for crash recovery.
+- [ ] 25.3 Toast notifications reflecting pause/resume.
+- [ ] 25.4 Regression test: pause mid-sentence, resume, ensure no audio drop.
+
+## 26  Self-Healing Dependency Checker
+- [ ] 26.1 Extend `system_check.py` to detect missing CUDA/NVIDIA driver actionable fixes.
+- [ ] 26.2 Attempt silent reinstall/update of critical dependencies; log outcome.
+- [ ] 26.3 Unit test: simulate missing driver to validate error path.
+
 ---
 
 **End of task list – keep adding below this line, never delete history.** 

@@ -80,6 +80,19 @@ The entire user experience is mediated through global hotkeys and system notific
     - Upon completion, a final notification MUST appear: "Transcription complete. Text copied to clipboard."
     - Simultaneously, the full, clean, punctuated, and capitalized text (with no timestamps) MUST be placed onto the system clipboard.
 
+- **FR-3.2.4: Background Batch Transcription**
+    - While a recording is in progress, the application MUST automatically slice the audio stream into 10-minute batches and begin transcribing each batch in the background.
+    - When the user finally stops the recording, only the final, un-transcribed batch MAY remain for processing, ensuring near-instantaneous completion regardless of total recording length.
+
+- **FR-3.2.5: Long-Silence Pruning**
+    - Prior to sending any audio batch to the ASR model, the application MUST detect and remove continuous periods of silence longer than 2 minutes.
+    - The silence-length threshold MUST be configurable via `config.json` (default: `120000` ms).
+
+- **FR-3.2.6: Clipboard Robustness & Fallback**
+    - After each transcription, the application MUST verify that the clipboard operation succeeded by immediately reading back the clipboard contents and confirming the byte-length matches the intended text.
+    - If the clipboard verification fails, the application MUST write the transcription to a `.txt` file inside the session folder, using the naming convention defined in FR-4.4.5.
+    - This fallback MUST guarantee that the transcription is never lost, even for extremely large texts.
+
 3.3. ON-DEMAND RESOURCE MANAGEMENT
 The user has direct control over the application's VRAM footprint without exiting the application.
 
@@ -127,6 +140,12 @@ The user has direct control over the application's VRAM footprint without exitin
     - `recording.wav`: The original, high-quality, full-length audio file.
     - A `.txt` file containing the final, clean transcription.
 - **FR-4.4.5:** The filename of the `.txt` file MUST be algorithmically generated from its own content: it is named after the first seven words of the transcription, with spaces replaced by underscores. (e.g., "The_primary_objective_for_the_next.txt").
+
+4.5. CLIPBOARD ROBUSTNESS GUARANTEE
+
+- **FR-4.5.1:** After every clipboard copy attempt, the application MUST validate success by re-reading the clipboard and comparing the text length.
+- **FR-4.5.2:** On validation failure, the application MUST invoke the fallback mechanism specified in FR-3.2.6 without user intervention.
+- **FR-4.5.3:** All clipboard failures MUST be logged to `app.log` with a timestamp and error details to aid debugging.
 
 
 5.0 NON-FUNCTIONAL REQUIREMENTS
