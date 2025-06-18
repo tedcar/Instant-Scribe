@@ -37,3 +37,24 @@ pip-compile --upgrade --output-file requirements.txt requirements.in
 ## NVIDIA Parakeet Model
 
 Instant Scribe relies exclusively on the **NVIDIA Parakeet TDT 0.6B-v2** speech-to-text model. The model is pulled on first run by the NeMo toolkit and cached locally (see `transcription_worker.py`).
+
+### Verify CUDA visibility
+
+Run the simple smoke-test to confirm PyTorch detects your NVIDIA GPU:
+
+```powershell
+python scripts/check_cuda.py
+```
+
+You should see output similar to:
+
+```
+✅ CUDA is available!
+   • Device index : 0
+   • Name         : NVIDIA GeForce RTX 4070
+   • Total VRAM   : 8.00 GB
+   • Compute (SM) : 8.9
+   • PyTorch CUDA : 12.1
+```
+
+If you receive an error, install/upgrade your GPU driver and ensure you used the CUDA-enabled PyTorch wheel.

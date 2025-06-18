@@ -16,7 +16,7 @@
 ## 1  Development Environment
 - [x] 1.1 Create **Python 3.10** virtual‐environment bootstrap script (`scripts/setup_env.ps1`). (commit: c254f81)
 - [x] 1.2 Pin all core dependencies and generate `requirements.txt` via `pip-compile`. (commit: c254f81)
-- [ ] 1.3 Write smoke test verifying PyTorch can see CUDA (`python scripts/check_cuda.py`).
+- [x] 1.3 Write smoke test verifying PyTorch can see CUDA (`python scripts/check_cuda.py`). (commit: pending)
 - [x] 1.4 Document environment setup in `README.md` (dev section). (commit: c254f81)
 
 ## 2  Logging & Configuration Framework
