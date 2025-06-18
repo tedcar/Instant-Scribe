@@ -1,39 +1,39 @@
-# Instant Scribe
+# Instant-Scribe
 
-A minimalist, high-performance, local-first transcription tool for Windows.
+## Development Environment Setup
 
----
+The project uses a dedicated Python virtual environment to isolate dependencies. Follow these steps to get up and running on Windows 10 (PowerShell):
 
-## Development Setup
+```powershell
+# 1. Clone the repository and cd into it
+# git clone https://github.com/<your-fork>/Instant-Scribe.git
+# cd Instant-Scribe
 
-This project uses Python 3.10+ and `pip-tools` for dependency management.
+# 2. Create a Python 3.10 (or newer) virtual environment in .venv
+python -m venv .venv
 
-1.  **Clone the repository:**
-    ```sh
-    git clone <repository-url>
-    cd Instant-Scribe
-    ```
+# 3. Activate the environment for the current session
+.\.venv\Scripts\activate
 
-2.  **Create the virtual environment:**
-    Run the PowerShell script to create an isolated virtual environment.
-    ```powershell
-    ./scripts/setup_env.ps1
-    ```
+# 4. Upgrade pip and install project requirements
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 
-3.  **Activate the environment:**
-    ```powershell
-    ./.venv/Scripts/Activate.ps1
-    ```
+# 5. Verify that the environment is working
+python -m pip list
+```
 
-4.  **Install dependencies:**
-    The `requirements.txt` file is generated from `requirements.in`. To install the pinned dependencies, run:
-    ```sh
-    pip install -r requirements.txt
-    ```
+A convenience bootstrap script is available under `scripts/setup_env.ps1` that automates steps 2-4.
 
-5.  **Running Tools:**
-    With the environment activated, you can run tools like `pytest`.
+### Regenerating the lock-file (requirements.txt)
 
----
+High-level dependencies live in `requirements.in`. Run the following **inside the activated venv** whenever you add or update a dependency:
 
-*This README will be updated with user-facing documentation upon first release.*
+```powershell
+pip install pip-tools
+pip-compile --upgrade --output-file requirements.txt requirements.in
+```
+
+## NVIDIA Parakeet Model
+
+Instant Scribe relies exclusively on the **NVIDIA Parakeet TDT 0.6B-v2** speech-to-text model. The model is pulled on first run by the NeMo toolkit and cached locally (see `transcription_worker.py`).

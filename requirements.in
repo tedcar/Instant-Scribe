@@ -1,29 +1,11 @@
-# Instant Scribe - Core Dependencies
-#
-# This file lists the direct dependencies for the project.
-# Use `pip-compile requirements.in` to generate the full `requirements.txt` file.
-# See: https://github.com/jazzband/pip-tools
-
-# Core ML/ASR Framework
-# nemo_toolkit is not compatible with Windows due to the 'triton' dependency.
-# Replacing with openai-whisper.
-openai-whisper
-torch>=2.0
-# For CUDA-specific builds, the user should install manually, e.g.:
-# pip install torch --index-url https://download.pytorch.org/whl/cu118
-
-# Audio & VAD
+torch
 pyaudio==0.2.14
 webrtcvad-wheels==2.0.14
-
-# System Integration & UI
 keyboard==0.13.5
 pystray==0.19.0
 windows-toasts==1.3.1
-pyperclip  # For copying to clipboard
-
-# Development & Packaging
 pyinstaller==6.8.0
 pynsist==2.8
-pip-tools
-pytest 
+pyperclip==1.9.0
+pytest>=8.4.0
+pip-tools 
