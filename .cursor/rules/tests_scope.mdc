@@ -1,0 +1,19 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+- **Write tests at the task level, not the sub-task level**
+  - A *whole task* corresponds to an H2 section in `Progress/DEV_TASKS.md` (e.g. "Logging & Configuration Framework").
+  - Do **not** create separate test files for sub-tasks like `2.1` or `2.2`; cover their behaviour in a single test module for Task 2 as a whole.
+
+- **Why**
+  - Reduces test churn when subtasks evolve or are re-ordered.
+  - Keeps CI fast by avoiding overly granular suites.
+
+- **Implementation guidance**
+  - Group related assertions within the same `tests/test_<task_slug>.py` file.
+  - Use descriptive docstrings to map tests back to the DEV_TASKS numbering.
+
+- **Environment immutability reminder**
+  - Tests **must not** install or upgrade packages, modify global environment variables, or depend on system state changes.

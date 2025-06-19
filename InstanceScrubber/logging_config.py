@@ -82,4 +82,4 @@ def setup_logging(
 
 
 # Auto-configure when module is imported -----------------------------------
-setup_logging()
+setup_logging() 

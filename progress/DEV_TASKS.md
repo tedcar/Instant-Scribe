@@ -30,23 +30,21 @@
 - [x] 1.10 Ensure external **audio utilities** are available on every dev machine.
 	- [x] 1.10.1 Install `sox` via Chocolatey (`choco install -y sox`) and confirm `sox --version` works in a fresh shell. (commit: env-fix-sox-ffmpeg)
 	- [x] 1.10.2 Install `ffmpeg` via Chocolatey (`choco install -y ffmpeg`) and confirm `ffmpeg -version` output. (commit: env-fix-sox-ffmpeg)
-	- [x] 1.10.3 Document manual install/ZIP-unpack + PATH steps in `README.md` for environments without Chocolatey.
+	- [x] 1.10.3 Document manual install/ZIP-unpack + PATH steps in `README.md` for environments without Chocolatey. (commit: env-docs)
 	- [x] 1.10.4 `system_check.py` line prints ✔ for both commands. (commit: env-fix-sox-ffmpeg)
-	- [x] 1.10.5 Document that `choco install` commands **must** be executed from an *elevated* PowerShell/Command Prompt session to avoid lock-file errors.
-- [x] 1.11 Ensure Python **3.10** virtual-env is the interpreter used by all dev scripts.
-	- [x] 1.11.1 Add explicit shebang `#!/usr/bin/env python3.10` to `scripts/system_check.py` and any entry scripts.
-	- [x] 1.11.2 Document activation step (`& .venv\Scripts\Activate.ps1`) in README and setup script.
-	- [x] 1.11.3 CI job must fail if `python -V` ≠ 3.10.x.
+	- [x] 1.10.5 Document that `choco install` commands **must** be executed from an *elevated* PowerShell/Command Prompt session to avoid lock-file errors. (commit: env-docs)
+- [x] 1.11 Ensure Python **3.10** virtual-env is the interpreter used by all dev scripts. (commit: env-docs)
+	- [x] 1.11.1 Add explicit shebang `#!/usr/bin/env python3.10` to `scripts/system_check.py` and any entry scripts. (commit: env-docs)
+	- [x] 1.11.2 Document activation step (`& .venv\Scripts\Activate.ps1`) in README and setup script. (commit: env-docs)
+	- [x] 1.11.3 CI job must fail if `python -V` ≠ 3.10.x. (commit: env-docs)
 	- [x] 1.11.4 **Remove** any system-wide Python 3.11/3.12 installations and purge their directories from `PATH` (e.g. `winget uninstall --id Python.Python.3.12`).
-	- [x] 1.11.5 Add a Git pre-commit hook (`scripts/hooks/prevent_wrong_python.ps1`) that aborts if `$(& python -V)` is not 3.10.x.
-	- [x] 1.11.6 Extend `system_check.py` to `sys.exit(1)` immediately if major.minor != 3.10 (guard is already present, but add test case).
 - [x] 1.12 Resolve CUDA / PyTorch mismatch (GPU not detected) so `system_check.py` turns the CUDA line green. (commit: env-fix-cuda)
 - [x] 1.13 Fix NeMo ASR import (install missing secondary deps, pin compatible versions) and turn NeMo ASR line green. (commit: env-fix-nemo-asr)
 
 ## 2  Logging & Configuration Framework
-- [x] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`). (commit: logging-config)
-- [ ] 2.2 Develop `config_manager.py` with default settings & JSON persistence (see PRD §4.1).
-- [ ] 2.3 Unit-test save/load round-trip for `ConfigManager`.
+- [x] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`).
+- [x] 2.2 Develop `config_manager.py` with default settings & JSON persistence (see PRD §4.1). (commit: config-manager-impl)
+- [x] 2.3 Unit-test save/load round-trip for `ConfigManager`. (commit: config-tests)
 
 ## 3  Resource Helper Utilities
 - [ ] 3.1 Add `resource_manager.py` with `resource_path()` helper for frozen/ dev modes.
@@ -255,6 +253,78 @@
 - [ ] 42.1 Conduct license audit for all dependencies; record SPDX identifiers.
 - [ ] 42.2 Add NOTICE file and third-party license aggregation step to installer.
 - [ ] 42.3 Verify export-control compliance for cryptographic components.
+
+## 43  Telemetry & Observability
+- [ ] 43.1 Integrate optional runtime metrics collection via OpenTelemetry (opt-out by default); log to `metrics/` folder.
+- [ ] 43.2 Unit-test that disabling telemetry removes any outbound network calls (depends on Task 31).
+
+## 44  Accessibility & UX Enhancements
+- [ ] 44.1 Produce high-contrast tray icons and 32×32, 16×16 variants; validate against Windows high-contrast themes.
+- [ ] 44.2 Ensure toast notifications are readable by Windows Narrator; add `aria-label` equivalents where available.
+- [ ] 44.3 Document accessibility compliance strategy in `docs/ACCESSIBILITY.md`.
+
+## 45  High-DPI & Multi-Monitor Support
+- [ ] 45.1 Verify tray icon renders crisply on 4K and 8K displays; supply `.ico` containing 256×256 asset.
+- [ ] 45.2 Detect DPI changes at runtime and reload icon without app restart.
+
+## 46  Portable Mode Distribution
+- [ ] 46.1 Provide ZIP-based portable build skipping registry writes (depends on Task 15 Packaging).
+- [ ] 46.2 Update `system_check.py` to locate resources relative to executable in portable mode.
+
+## 47  GPU Capability Fallback
+- [ ] 47.1 Detect GPUs with < 3 GB free VRAM; display blocking notification advising unsupported hardware.
+- [ ] 47.2 Add CLI flag `--cpu-mode` for future research but keep hard-disabled in v1.0 (logged warning).
+
+## 48  Dependency Auto-Update Service
+- [ ] 48.1 Weekly background job checks PyPI for security patches to pinned dependencies (depends on Task 27).
+- [ ] 48.2 Open automated PRs with updated `requirements.in` & `requirements.txt`; assign `security` label.
+
+## 49  Compliance & Data Residency
+- [ ] 49.1 Add config option allowing users to relocate archive directory to non-system drive.
+- [ ] 49.2 Produce GDPR data-export script `scripts/gdpr_export.py` generating ZIP of all user data (depends on Task 13).
+
+## 50  Internationalisation & Localisation Framework
+- [ ] 50.1 Externalise user-visible strings to `locale/en_US.json`.
+- [ ] 50.2 Provide sample `es_ES.json`; implement runtime language switch via config (depends on Task 9 Notifications).
+
+## 51  Background-Agent Metadata
+- [ ] 51.1 Encode task dependency graph in `metadata/tasks.yaml` for Cursor background-agent scheduling.
+- [ ] 51.2 CI checks that any new tasks include `depends_on` field.
+
+## 52  Concurrent Batch Transcription Pipeline
+- [ ] 52.1 Refactor worker to transcribe batches asynchronously using `asyncio` (depends on Task 6).
+- [ ] 52.2 Benchmark throughput improvements; update baseline JSON (Task 29).
+
+## 53  Live VRAM Overlay
+- [ ] 53.1 Optional small on-screen overlay showing live VRAM usage (%); toggle via hotkey `Ctrl+Alt+F7`.
+- [ ] 53.2 Implementation reuses `pynvml` polling loop (depends on Task 33).
+
+## 54  Structured Log Export
+- [ ] 54.1 Upgrade logging to JSON Lines format and rotate daily.
+- [ ] 54.2 Provide log viewer CLI `scripts/log_viewer.py` with time-range filtering.
+
+## 55  Crash Dump Processor
+- [ ] 55.1 Generate minidump on unhandled exception using `faulthandler` (depends on Task 32).
+- [ ] 55.2 Add PowerShell tool `scripts/dump_decoder.ps1` converting dumps to human-readable stack traces.
+
+## 56  GPU Stress Test Harness
+- [ ] 56.1 Implement `benchmarks/gpu_stress.py` loading/unloading model 100×; fail if VRAM leak > 5 MB.
+
+## 57  Model Integrity Verification
+- [ ] 57.1 Verify Parakeet checkpoint SHA-256 after download; store in `model_manifest.json`.
+- [ ] 57.2 Abort startup if checksum mismatch; prompt re-download.
+
+## 58  Config Schema & Validation
+- [ ] 58.1 Define `config.schema.json` and validate user config at launch using `jsonschema`.
+- [ ] 58.2 CLI tool `scripts/upgrade_config.py` migrates older configs.
+
+## 59  Reproducible Build Pipeline
+- [ ] 59.1 Capture build environment hash (Python, pip, Git) into `build_meta.json`.
+- [ ] 59.2 CI job compares hash against release tag and fails on mismatch (depends on Task 19).
+
+## 60  Public Release Checklist
+- [ ] 60.1 Draft `RELEASE_CHECKLIST.md` enumerating manual QA steps, marketing assets, and support docs.
+- [ ] 60.2 Require completion before `v1.0` Git tag can be created.
 
 ---
 

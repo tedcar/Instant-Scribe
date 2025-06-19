@@ -1,0 +1,22 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+- **Production code must reside in `InstanceScrubber/`**
+  - Any `.py` file outside `InstanceScrubber/` (excluding `tests/`, `scripts/`, or tooling) is a rule violation.
+  - Sub-packages are permitted, e.g. `InstanceScrubber/audio/`.
+  - Rationale: keeps import paths predictable and supports single-point packaging.
+
+- **Exceptions**
+  - Entry-point launcher scripts inside `scripts/`.
+  - Cursor rule files and generated stubs.
+
+- **Examples**
+  ```python
+  # ✅ Valid – located in core package
+  InstanceScrubber/config_manager.py
+
+  # ❌ Invalid – top-level helper leaks out of package
+  stray_util.py  # must be moved into InstanceScrubber/ or deleted
+  ```
