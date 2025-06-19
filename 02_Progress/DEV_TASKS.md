@@ -111,13 +111,13 @@
 - [ ] 14.2 Self-log to `watchdog.log` and back-off 5 s on crash loops.
 - [ ] 14.3 PowerShell script to register watchdog in Windows startup.
 
-## 15  Packaging – PyInstaller
+## 15  Packaging – PyInstaller (depends on Tasks 1–14 completed)
 - [ ] 15.1 Generate initial `Instant Scribe.spec` with `--noconsole`.
 - [ ] 15.2 Customise `datas` to include Parakeet model cache.
 - [ ] 15.3 Implement `resource_path` calls throughout codebase.
 - [ ] 15.4 Produce first working `dist/Instant Scribe/Instant Scribe.exe`.
 
-## 16  Installer – Pynsist
+## 16  Installer – Pynsist (depends on Task 15 completed)
 - [ ] 16.1 Write `installer.cfg` referencing bundled wheel versions.
 - [ ] 16.2 Build `.exe` installer; verify silent install & uninstall flows.
 - [ ] 16.3 Add Post-install step to pin Start-up shortcut.
@@ -173,6 +173,88 @@
 - [ ] 26.1 Extend `system_check.py` to detect missing CUDA/NVIDIA driver actionable fixes.
 - [ ] 26.2 Attempt silent reinstall/update of critical dependencies; log outcome.
 - [ ] 26.3 Unit test: simulate missing driver to validate error path.
+
+## 27  Dependency Management & Automated Pinning
+- [ ] 27.1 Audit all direct and transitive dependencies; record minimum compatible versions in `requirements.in`.
+- [ ] 27.2 Automate weekly `pip-compile` run; open PR when the lockfile diff exceeds two patches.
+- [ ] 27.3 Add CI gate that fails if `pip check` reports vulnerabilities or version mismatches.
+- [ ] 27.4 Document upgrade policy and review checklist in `docs/DEPENDENCIES.md`.
+
+## 28  Code Style, Linting & Static Analysis
+- [ ] 28.1 Adopt `black` + `isort` for formatting; enforce via pre-commit hook.
+- [ ] 28.2 Integrate `flake8` with custom rules mirroring project cursor-rules.
+- [ ] 28.3 Introduce `mypy` type-checking across all modules; target `strict` mode for new code.
+- [ ] 28.4 CI job fails on style or typing errors; annotate offending lines in PR review.
+
+## 29  Continuous Performance Benchmarking
+- [ ] 29.1 Implement `benchmarks/rtf_benchmark.py` measuring Real-Time-Factor (RTF) for 30-s sample audio.
+- [ ] 29.2 Store baseline metrics in `benchmark_baselines.json`; flag CI failure if regression > 10 %.
+- [ ] 29.3 Generate GitHub Actions artifact containing GPU-utilisation timeline and VRAM graph.
+
+## 30  Security & Code Signing
+- [ ] 30.1 Acquire Authenticode certificate; store encrypted PFX in repository secrets.
+- [ ] 30.2 Automate `signtool` signing of `Instant Scribe.exe` within the release workflow.
+- [ ] 30.3 Add PowerShell script `verify_signature.ps1`; CI job fails if signature missing or invalid.
+
+## 31  Privacy Audit & Network Guard
+- [ ] 31.1 Static-scan codebase for network calls (`socket`, `requests`, `http.client`).
+- [ ] 31.2 Unit-test asserting that no outbound connections occur during a full recording/transcription cycle.
+- [ ] 31.3 Document privacy guarantee in `docs/PRIVACY.md`; include audit script results.
+
+## 32  Crash Reporting & Exception Analytics
+- [ ] 32.1 Implement `crash_reporter.py` capturing uncaught exceptions to rotating `crash.log` (10 × 1 MB).
+- [ ] 32.2 Attach most recent `crash.log` to a ZIP in `%APPDATA%/Instant Scribe/reports` for manual user share.
+- [ ] 32.3 Regression test: induce `ZeroDivisionError`, ensure log file generated and application restarts via watchdog.
+
+## 33  GPU Resource Management Enhancements
+- [ ] 33.1 Integrate `pynvml` to monitor real-time VRAM utilisation.
+- [ ] 33.2 Auto-unload model when VRAM free < configurable threshold (default 1 GB).
+- [ ] 33.3 Notify user via toast and tray icon badge when automatic unload occurs.
+
+## 34  Advanced Testing Infrastructure
+- [ ] 34.1 Reach 90 % line coverage using `pytest-cov` (up from 80 %).
+- [ ] 34.2 Add property-based tests with `hypothesis` for VAD gate edge cases.
+- [ ] 34.3 Introduce `pytest-benchmark` for performance regressions (ties to Task 29).
+
+## 35  Archive Backup & Restore Utilities
+- [ ] 35.1 Implement scheduled ZIP backup of session archive to user-defined location.
+- [ ] 35.2 Provide `archive_restore.py` CLI restoring backups into the canonical folder structure.
+- [ ] 35.3 Integration test: backup-then-restore cycle preserves file hashes.
+
+## 36  Clipboard Integrity Enhancements
+- [ ] 36.1 Add CRC32 checksum to clipboard payload; verify after paste.
+- [ ] 36.2 On checksum mismatch, trigger fallback file write (leverages Task 23 logic).
+- [ ] 36.3 Document rare clipboard failure scenarios and mitigation steps.
+
+## 37  Audio Quality Optimisations
+- [ ] 37.1 Implement optional automatic gain control (AGC) using `pydub`.
+- [ ] 37.2 Add noise suppression toggle leveraging RNNoise; expose in config.
+- [ ] 37.3 Comparative benchmark: WER before/after AGC + noise suppression.
+
+## 38  Continuous Integration & Release Automation
+- [ ] 38.1 Consolidate lint, test, benchmark, build, sign, and upload steps into a single reusable GitHub Actions workflow.
+- [ ] 38.2 Publish signed installer to GitHub Releases; auto-increment semantic version.
+- [ ] 38.3 Slack/Teams webhook notification on successful release (configurable, defaults to disabled).
+
+## 39  Parakeet Model Update Checker
+- [ ] 39.1 Weekly background job checks Hugging Face for newer Parakeet TDT checkpoints.
+- [ ] 39.2 Prompt user via toast to download & benchmark candidate model.
+- [ ] 39.3 Provide CLI flag `--force-model-update` to bypass prompt.
+
+## 40  End-to-End System Load Testing
+- [ ] 40.1 Simulate 8-hour continuous recording; monitor CPU/GPU/RAM for leaks.
+- [ ] 40.2 Fail test if cumulative VRAM usage drifts > 5 % post-GC.
+- [ ] 40.3 Generate HTML report with Grafana-style graphs.
+
+## 41  Codebase Modularisation & Documentation
+- [ ] 41.1 Refactor monolithic modules into domain-focused packages (`audio`, `ipc`, `ui`, `core`).
+- [ ] 41.2 Auto-generate API docs with `pdoc`; publish to GitHub Pages.
+- [ ] 41.3 Add architectural decision records (ADRs) following the MADR template.
+
+## 42  Legal & Compliance Review
+- [ ] 42.1 Conduct license audit for all dependencies; record SPDX identifiers.
+- [ ] 42.2 Add NOTICE file and third-party license aggregation step to installer.
+- [ ] 42.3 Verify export-control compliance for cryptographic components.
 
 ---
 
