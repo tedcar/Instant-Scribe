@@ -1,0 +1,24 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+- **What is `InstanceScrubber`?**
+  - The single top-level Python package that contains *all* production code for the Instant Scribe application.
+  - Think of it as the "src/" directory in other projects.
+
+- **Why keep it?**
+  1. Packaging – PyPI wheel and PyInstaller builds require a canonical package root.
+  2. Import hygiene – avoids clashes with third-party modules and keeps `import` statements predictable.
+  3. Cursor rule `folder_structure.mdc` depends on its existence; deleting/renaming breaks CI.
+
+- **DO NOT**
+  - Delete or move this folder.
+  - Scatter new production modules outside it (see folder_structure rule).
+
+- **Allowed sub-folders** (examples):
+  - `InstanceScrubber/audio/` – audio capture helpers
+  - `InstanceScrubber/ipc/` – inter-process communication
+  - `InstanceScrubber/ui/` – tray UI components
+
+- **Non-production code** (tests, scripts, docs) belongs **outside** `InstanceScrubber/`.
