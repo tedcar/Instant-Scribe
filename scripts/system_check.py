@@ -113,12 +113,20 @@ def _require_nemo() -> None:
                 # Enum modifications can fail; ignore as last resort.
                 pass
 
-    # Attempt to import ASR collection; if it fails, warn but do not mark check failed.
+    # Attempt to import ASR collection. The ASR collection relies on Linux-only
+    # native extensions and often fails to import on Windows. Treat that case as
+    # *informational* rather than an outright failure to avoid confusing users
+    # with a red cross when the core toolkit works fine.
     try:
         import nemo.collections.asr as _  # noqa: F401
         _print_ok("NeMo ASR collection import OK")
-    except Exception as warn:
-        _print_fail("NeMo ASR collection import failed – some functionality may be limited")
+    except Exception:
+        if sys.platform.startswith("win"):
+            # Gracefully skip on Windows – the rest of Instant-Scribe does not
+            # need the full ASR collection when running the pre-built model.
+            _print_ok("NeMo ASR collection unavailable on Windows – skipped")
+        else:
+            _print_fail("NeMo ASR collection import failed – some functionality may be limited")
 
 
 def _require_command(cmd: str, *version_args: str) -> None:

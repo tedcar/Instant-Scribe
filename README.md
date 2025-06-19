@@ -4,6 +4,16 @@
 
 The project uses a dedicated Python virtual environment to isolate dependencies. Follow these steps to get up and running on Windows 10 (PowerShell):
 
+> **Heads-up about NumPy**  
+> PyTorch wheels are currently compiled against *NumPy&nbsp;<2*. The dependency is already
+> pinned in `requirements.in`, so the right version will be installed automatically.
+> If you later upgrade packages and start seeing a `A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x` message, just run:
+>
+> ```powershell
+> pip install "numpy<2" --upgrade
+> ```
+> inside the activated virtual-env.
+
 ```powershell
 # 1. Clone the repository and cd into it
 # git clone https://github.com/<your-fork>/Instant-Scribe.git
@@ -22,6 +32,20 @@ python -m pip install -r requirements.txt
 # 5. Verify that the environment is working
 python -m pip list
 ```
+
+After installation run the quick health-check:
+
+```powershell
+python scripts\system_check.py
+```
+
+You should get an all-green report. On Windows the check will print:
+
+```
+✔ NeMo ASR collection unavailable on Windows – skipped
+```
+
+This is expected—the core model works fine without the full ASR collection.
 
 A convenience bootstrap script is available under `scripts/setup_env.ps1` that automates steps 2-4.
 

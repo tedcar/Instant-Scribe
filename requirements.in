@@ -21,4 +21,8 @@ tomli>=2.0.1
 exceptiongroup>=1.2.0
 Pillow==10.3.0
 
+# PyTorch 2.x wheels are compiled against NumPy <2. Pin to avoid noisy runtime
+# warning ("A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x …").
+numpy<2
+
 # Remove numpy<2 pin to allow PyTorch requirement satisfaction 
