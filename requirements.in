@@ -1,4 +1,10 @@
-torch
+--extra-index-url https://download.pytorch.org/whl/cu118
+
+# Pin GPU-enabled PyTorch stack (CUDA 11.8) for Windows wheels
+torch==2.3.0+cu118
+torchaudio==2.3.0+cu118
+torchvision==0.18.0+cu118
+
 pyaudio==0.2.14
 webrtcvad-wheels==2.0.14
 keyboard==0.13.5
@@ -12,4 +18,7 @@ pip-tools
 nemo_toolkit[asr]==2.1.0
 texterrors>=1.0.9
 tomli>=2.0.1
-exceptiongroup>=1.2.0 
+exceptiongroup>=1.2.0
+Pillow==10.3.0
+
+# Remove numpy<2 pin to allow PyTorch requirement satisfaction 

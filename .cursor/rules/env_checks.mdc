@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- **Pin binary wheels that ship compiled C extensions**
+  - Example: `Pillow` must be explicitly pinned (`Pillow==10.3.0` on Windows) so that a pre-built `.whl` is installed rather than a source build missing `_imaging`.
+  - DO add the pin in `requirements.in`; let `pip-compile` propagate it.
+  - DON'T leave the version unpinned or allow `pip` to attempt a source build.
+
+- **Verify NeMo ASR import at check time**
+  - `system_check.py` must import `nemo.collections.asr` and fail if it raises (toolkit lacking secondary deps).
+  - When bumping NeMo or Torch versions, run the check locally before committing the lock file.
+
+- **External audio tooling must be on PATH**
+  - The checker calls `sox --version` and `ffmpeg -version`.
+  - If missing: document installation via Chocolatey (`choco install -y sox ffmpeg`) and update `README.md`.
+  - Scripts that rely on audio manipulation must guard with the same checks.
+
+- **When a new environment breakage is discovered**
+  - FIRST: fix the env (pin wheel, add CLI, etc.).
+  - THEN: codify the fix as another bullet in this rule file so the mistake is never repeated.
+  - Example commit message: `rules: add safeguard for <issue>`
+
+- **Chocolatey installs require an elevated shell**
+  - Always run `PowerShell` (or `cmd`) with **Run as Administrator** before invoking Chocolatey; otherwise package extraction may fail with *"Unable to obtain lock file access..."* errors.
+  - If a previous failed install left behind a GUID-named lock directory under `C:\ProgramData\chocolatey\lib`, delete the folder (or run `choco clean --cache`) before retrying.
+  - CI or automation scripts must call Chocolatey via `Start-Process -Verb RunAs` or equivalent to guarantee admin rights.
+  - Document this prerequisite in `README.md` and any setup scripts that call `choco install`.
+
+

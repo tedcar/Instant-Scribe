@@ -21,8 +21,27 @@
 - [x] 1.4 Document environment setup in `README.md` (dev section). (commit: c254f81)
 - [x] 1.5 Enforce GPU presence at startup – application exits with error if `torch.cuda.is_available()` is False. (commit: pending)
 - [x] 1.6 Update `setup_env.ps1` to include installation of system-level audio dependencies (e.g., using Chocolatey for `sox`, `ffmpeg`). (commit: pending)
-- [ ] 1.7 Extend `check_cuda.py` to become `system_check.py`, adding verification for `sox` and `ffmpeg` command availability.
+- [x] 1.7 Extend `check_cuda.py` to become `system_check.py`, adding verification for `sox` and `ffmpeg` command availability. (commit: pending)
 - [x] 1.8 Pin `nemo_toolkit[asr]` to v2.1.0 and align Torch/TorchAudio/TorchVision to 2.7.1 + cu118 for Windows wheel compatibility. (commit: pending)
+- [x] 1.9 Resolve NeMo **ASR collection import failure** detected by `system_check.py`. (commit: env-fix-nemo-asr)
+	- [x] 1.9.1 Reinstall Pillow from binary wheels to restore `PIL._imaging` extension (commit: env-fix-pillow)
+	- [x] 1.9.2 Verify secondary dependencies (`torchmetrics`, `matplotlib`, `pyannote.audio`, `pydantic<2.0`, etc.) import without errors; pin versions as needed in `requirements.in`. (commit: env-fix-nemo-asr)
+	- [x] 1.9.3 Update `system_check.py` status output to turn NeMo line green. (commit: env-fix-nemo-asr)
+- [x] 1.10 Ensure external **audio utilities** are available on every dev machine.
+	- [x] 1.10.1 Install `sox` via Chocolatey (`choco install -y sox`) and confirm `sox --version` works in a fresh shell. (commit: env-fix-sox-ffmpeg)
+	- [x] 1.10.2 Install `ffmpeg` via Chocolatey (`choco install -y ffmpeg`) and confirm `ffmpeg -version` output. (commit: env-fix-sox-ffmpeg)
+	- [ ] 1.10.3 Document manual install/ZIP-unpack + PATH steps in `README.md` for environments without Chocolatey.
+	- [x] 1.10.4 `system_check.py` line prints ✔ for both commands. (commit: env-fix-sox-ffmpeg)
+	- [ ] 1.10.5 Document that `choco install` commands **must** be executed from an *elevated* PowerShell/Command Prompt session to avoid lock-file errors.
+- [ ] 1.11 Ensure Python **3.10** virtual-env is the interpreter used by all dev scripts.
+	- [ ] 1.11.1 Add explicit shebang `#!/usr/bin/env python3.10` to `scripts/system_check.py` and any entry scripts.
+	- [ ] 1.11.2 Document activation step (`& .venv\Scripts\Activate.ps1`) in README and setup script.
+	- [ ] 1.11.3 CI job must fail if `python -V` ≠ 3.10.x.
+	- [ ] 1.11.4 **Remove** any system-wide Python 3.11/3.12 installations and purge their directories from `PATH` (e.g. `winget uninstall --id Python.Python.3.12`).
+	- [ ] 1.11.5 Add a Git pre-commit hook (`scripts/hooks/prevent_wrong_python.ps1`) that aborts if `$(& python -V)` is not 3.10.x.
+	- [ ] 1.11.6 Extend `system_check.py` to `sys.exit(1)` immediately if major.minor != 3.10 (guard is already present, but add test case).
+- [x] 1.12 Resolve CUDA / PyTorch mismatch (GPU not detected) so `system_check.py` turns the CUDA line green. (commit: env-fix-cuda)
+- [x] 1.13 Fix NeMo ASR import (install missing secondary deps, pin compatible versions) and turn NeMo ASR line green. (commit: env-fix-nemo-asr)
 
 ## 2  Logging & Configuration Framework
 - [ ] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`).

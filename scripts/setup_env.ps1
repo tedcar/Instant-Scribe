@@ -21,20 +21,19 @@ $ErrorActionPreference = "Stop"
 Write-Host "[Instant Scribe] Creating virtual environment (.venv)..." -ForegroundColor Cyan
 & $PythonExe -m venv .venv
 
-Write-Host "[Instant Scribe] Activating virtual environment..." -ForegroundColor Cyan
-& .\.venv\Scripts\activate
-
 if (-not $SkipInstall) {
+    $venvPython = Join-Path -Path .\.venv\Scripts -ChildPath "python.exe"
+
     Write-Host "[Instant Scribe] Upgrading pip..." -ForegroundColor Cyan
-    python -m pip install --upgrade pip
+    & $venvPython -m pip install --upgrade pip
 
     Write-Host "[Instant Scribe] Installing CUDA-enabled PyTorch (GPU build)..." -ForegroundColor Cyan
     $torchVer = "2.3.0+$CudaVersion"
     $indexUrl = "https://download.pytorch.org/whl/$CudaVersion"
-    python -m pip install "torch==$torchVer" torchvision torchaudio --index-url $indexUrl
+    & $venvPython -m pip install "torch==$torchVer" torchvision torchaudio --index-url $indexUrl
 
     Write-Host "[Instant Scribe] Installing project Python requirements..." -ForegroundColor Cyan
-    python -m pip install -r requirements.txt
+    & $venvPython -m pip install -r requirements.txt
 
     # Ensure system-level audio tools are available
     Write-Host "[Instant Scribe] Verifying system audio dependencies (sox, ffmpeg)..." -ForegroundColor Cyan
@@ -52,4 +51,4 @@ if (-not $SkipInstall) {
     }
 }
 
-Write-Host "[Instant Scribe] Environment setup complete!`n`nTo activate in future sessions run:`n  .\.venv\Scripts\activate" -ForegroundColor Green 
+Write-Host "[Instant Scribe] Environment setup complete!`n`nTo activate the venv in future PowerShell sessions run:`n  .\\.venv\\Scripts\\Activate.ps1" -ForegroundColor Green 
