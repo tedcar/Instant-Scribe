@@ -22,8 +22,8 @@ The project uses a dedicated Python virtual environment to isolate dependencies.
 # 2. Create a Python 3.10 (or newer) virtual environment in .venv
 python -m venv .venv
 
-# 3. Activate the environment for the current session
-.\.venv\Scripts\activate
+# 3. Activate the environment for the current session (PowerShell)
+. .\scripts\Activate-IS.ps1
 
 # 4. Upgrade pip and install project requirements
 python -m pip install --upgrade pip
