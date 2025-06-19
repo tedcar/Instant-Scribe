@@ -230,4 +230,18 @@ The project adopts Calendar Versioning (`YYYY.MM.DD`).  A successful GitHub Acti
 •  Zero critical issues in Crash Reporter logs over a continuous 30-day beta period.
 •  Signed installer passes Windows SmartScreen with "Verified Publisher" status.
 
-This roadmap remains a living document; any change to dependency chains or critical path timing **requires** a corresponding PR that updates both this section and `DEV_TASKS.md`.  🔄 
+This roadmap remains a living document; any change to dependency chains or critical path timing **requires** a corresponding PR that updates both this section and `DEV_TASKS.md`.  🔄
+
+7.6  SECOND-WAVE TASK EXPANSION (TASKS 43–60)
+------------------------------------------------
+
+The post-beta learning cycle surfaced additional requirements centred on accessibility, compliance, observability, and long-term maintainability.  These have been codified into **Tasks 43 through 60** (see `DEV_TASKS.md`).  Their primary dependency vectors are summarised below so that Cursor background-agents can safely schedule concurrent work:
+
+•  **Core Observability Layer** (Tasks 43, 54, 55) – may begin immediately after Logging & Configuration Framework (Task 2) is merged.  
+•  **Accessibility & UX** (Tasks 44, 45, 50) – depend on System Tray UI (Task 8) and Notification Manager (Task 9).  
+•  **Distribution Variants** (Task 46) – extends Packaging work (Task 15) and must wait until that deliverable passes CI.  
+•  **GPU & Resource Enhancements** (Tasks 47, 53, 56, 57) – build upon the GPU Management foundation (Task 33).  
+•  **Continuous Improvement Loop** (Tasks 48, 51, 58, 59) – tie directly into Dependency Management (Task 27) and CI/CD Pipeline (Task 19).  
+•  **Compliance & Legal** (Tasks 49, 60) – triggered during the Release hardening phase after all functional tasks are green.
+
+These additions ensure **Instant Scribe** remains production-ready, legally compliant, and accessible to the widest possible user base without compromising its core philosophy of minimalism and lifelong operability.  🔄 

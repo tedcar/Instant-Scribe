@@ -76,7 +76,7 @@ def _require_pytorch_and_cuda() -> None:
     try:
         import torch  # noqa: F401
     except ImportError as exc:  # pragma: no cover
-        raise CheckError("PyTorch is not installed – install project requirements") from exc
+        raise CheckError("PyTorch is not installed – activate the project virtual environment and run `pip-sync` (or `pip install -r requirements.txt`) to install all requirements") from exc
 
     import torch
 
