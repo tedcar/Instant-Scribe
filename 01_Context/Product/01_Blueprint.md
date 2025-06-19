@@ -1,4 +1,3 @@
-
 Instant Scribe: A Comprehensive Blueprint for a Lifelong Speech-to-Text Application on Windows 10
 
 
@@ -41,8 +40,8 @@ Local-First, Robustness: Industry-best Word Error Rate (6.05%) and extreme speed
 3
 ML Framework
 NVIDIA NeMo Toolkit
-nemo_toolkit[asr]==1.23.0
-Robustness: The official, GPU-optimized framework for using Parakeet models. Provides a high-level API that simplifies model loading (from_pretrained) and inference (transcribe), ensuring stable and performant interaction with the AI core.
+nemo_toolkit[asr] (latest)
+Robustness: The official, GPU-optimized framework for using Parakeet models. Using the latest version ensures compatibility with the model's intended runtime (NeMo >= 2.2).
 6
 Language/Runtime
 Python & PyTorch
@@ -301,32 +300,29 @@ def get_detailed_transcription(self, audio_numpy_array):
         logging.error("Detailed transcription attempted but model is not loaded.")
         return "",
     try:
-        # return_hypotheses=True enables timestamp generation.
+        # The timestamps=True flag enables word-level timestamp generation.
         hypotheses = self.model.transcribe(
             audio=[audio_numpy_array],
             batch_size=1,
-            return_hypotheses=True
+            timestamps=True
         )
 
-        # The output format for RNN-T models can be a tuple.
-        if isinstance(hypotheses, tuple) and len(hypotheses) == 2:
-            hypotheses = hypotheses
-
         if not hypotheses:
-            return "",
+            return "", []
 
-        best_hypothesis = hypotheses
+        # The output is a list of hypotheses, we take the first one.
+        best_hypothesis = hypotheses[0]
         text = best_hypothesis.text
         
         # Extract word-level timestamps if available
-        word_timestamps =
+        word_timestamps = []
         if best_hypothesis.timestamp and 'word' in best_hypothesis.timestamp:
             word_timestamps = best_hypothesis.timestamp['word']
         
         return text, word_timestamps
     except Exception as e:
         logging.error(f"An error occurred during detailed transcription: {e}")
-        return "",
+        return "", []
 
 
 
@@ -687,12 +683,17 @@ Final Dependency Manifest (requirements.txt):
 
 
 # Core AI and Audio
-nemo_toolkit[asr]==1.23.0
-torch==2.1.0+cu118
-torchaudio==2.1.0+cu118
-torchvision==0.16.0+cu118
+nemo_toolkit[asr] # Use latest version for Parakeet v2
+torch>=2.1.0+cu118
+torchaudio>=2.1.0+cu118
+# torchvision is not strictly required for ASR but often included with torch
 pyaudio==0.2.14
-webrtcvad-wheels==2.0.14
+webrtcvad-wheels==0.2.0.14
+
+# System Dependencies (Handled by installer/setup script)
+# - sox
+# - ffmpeg
+# - libsndfile
 
 # UI and System Integration
 pystray==0.19.0
@@ -834,17 +835,15 @@ bitness=64
 
 [Include]
 # List all packages required by the application
+# Use the latest compatible versions resolved by pip-compile
 pypi_wheels =
-    nemo_toolkit[asr]==1.23.0
-    torch==2.1.0
-    torchaudio==2.1.0
+    nemo_toolkit[asr]
+    torch
+    torchaudio
     pyaudio==0.2.14
-    webrtcvad-wheels==2.0.14
+    webrtcvad-wheels==0.2.0.14
     pystray==0.19.0
     Pillow==10.1.0
-    keyboard==0.13.5
-    windows-toasts==1.3.1
-    # Add other dependencies as needed
 
 # Include the entire application directory created by PyInstaller
 files =

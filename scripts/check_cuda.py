@@ -32,4 +32,20 @@ print(textwrap.dedent(
        • PyTorch CUDA : {torch.version.cuda}
     """
 ))
+
+REQUIRED_PY_VERSION = (3, 10)
+if sys.version_info[:2] != REQUIRED_PY_VERSION:
+    sys.exit(
+        f"ERROR: Python {REQUIRED_PY_VERSION[0]}.{REQUIRED_PY_VERSION[1]} is required, but you are running {sys.version.split()[0]}."
+    )
+
+print(f"Python version {sys.version.split()[0]} OK.")
+
+try:
+    import nemo.collections.asr as _  # noqa: F401
+except ImportError:
+    sys.exit("ERROR: NVIDIA NeMo ASR collection is not installed. Ensure nemo_toolkit[asr] is present in requirements.")
+
+print("NeMo toolkit import OK.")
+
 sys.exit(0) 

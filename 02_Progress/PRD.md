@@ -35,8 +35,9 @@ The intended user is a Windows 10 "power user." This includes professionals, con
 | Component                 | Selected Technology         | Version/Spec                    | Justification                                                                                             |
 |---------------------------|-----------------------------|---------------------------------|-----------------------------------------------------------------------------------------------------------|
 | ASR Model                 | NVIDIA Parakeet TDT         | nvidia/parakeet-tdt-0.6b-v2     | Industry-best WER (6.05%) & speed (RTFx ~3380) in a local-first, efficient (<3GB VRAM) package.          |
-| ML Framework              | NVIDIA NeMo Toolkit         | nemo_toolkit[asr]==1.23.0        | Official, GPU-optimized framework for Parakeet models. Ensures stable, high-performance inference.        |
-| Language/Runtime          | Python & PyTorch            | python>=3.10, torch>=2.0        | Core requirement for NeMo. Rich ecosystem for audio, UI, and system integration.                          |
+| ML Framework              | NVIDIA NeMo Toolkit         | nemo_toolkit[asr]==2.1.0        | Windows wheel available; avoids build-tool chain while remaining fully compatible with Parakeet.        |
+| Language/Runtime          | Python & PyTorch            | Python 3.10, torch 2.7.1+cu118  | Version aligned with NeMo 2.1.0 and tested against CUDA 11.8 on RTX-30 series GPUs.                      |
+| System Dependencies       | Sox, FFmpeg, libsndfile     | Latest stable                   | Essential underlying audio processing libraries required by NeMo for handling various audio formats.      |
 | Audio Capture             | PyAudio                     | pyaudio==0.2.14                 | Stable, low-level bindings to PortAudio for reliable, direct microphone access on Windows.                |
 | Voice Activity Detection  | webrtcvad-wheels            | webrtcvad-wheels==2.0.14        | Critical for efficiency. Lightweight, real-time VAD prevents constant GPU load from the ASR model.      |
 | Global Hotkeys            | keyboard                    | keyboard==0.13.5                | Pure-Python, dependency-free global keyboard event hooking for a background application.                |
@@ -79,6 +80,7 @@ The entire user experience is mediated through global hotkeys and system notific
     - The Parakeet model, already in VRAM, performs the transcription.
     - Upon completion, a final notification MUST appear: "Transcription complete. Text copied to clipboard."
     - Simultaneously, the full, clean, punctuated, and capitalized text (with no timestamps) MUST be placed onto the system clipboard.
+    - **Technical Note:** While the primary output is timestamp-free, detailed word-level timestamps for diagnostic or future features can be obtained by passing `timestamps=True` to the model's `transcribe` method.
 
 - **FR-3.2.4: Background Batch Transcription**
     - While a recording is in progress, the application MUST automatically slice the audio stream into 10-minute batches and begin transcribing each batch in the background.

@@ -15,10 +15,14 @@
 
 ## 1  Development Environment
 - [x] 1.1 Create **Python 3.10** virtual‐environment bootstrap script (`scripts/setup_env.ps1`). (commit: c254f81)
-- [x] 1.2 Pin all core dependencies and generate `requirements.txt` via `pip-compile`. (commit: c254f81)
+- [x] 1.2 Pin all core dependencies and generate `requirements.txt` via `pip-compile`.
+	- [x] 1.2.1 Ensure `nemo_toolkit[asr]` is not pinned to a specific version initially to allow `pip-compile` to select the latest stable release compatible with the Parakeet model. (commit: pending)
 - [x] 1.3 Write smoke test verifying PyTorch can see CUDA (`python scripts/check_cuda.py`). (commit: 3eeee16)
 - [x] 1.4 Document environment setup in `README.md` (dev section). (commit: c254f81)
-- [ ] 1.5 Enforce GPU presence at startup – application exits with error if `torch.cuda.is_available()` is False.
+- [x] 1.5 Enforce GPU presence at startup – application exits with error if `torch.cuda.is_available()` is False. (commit: pending)
+- [x] 1.6 Update `setup_env.ps1` to include installation of system-level audio dependencies (e.g., using Chocolatey for `sox`, `ffmpeg`). (commit: pending)
+- [ ] 1.7 Extend `check_cuda.py` to become `system_check.py`, adding verification for `sox` and `ffmpeg` command availability.
+- [x] 1.8 Pin `nemo_toolkit[asr]` to v2.1.0 and align Torch/TorchAudio/TorchVision to 2.7.1 + cu118 for Windows wheel compatibility. (commit: pending)
 
 ## 2  Logging & Configuration Framework
 - [ ] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`).
@@ -43,6 +47,7 @@
 ## 6  Transcription Worker Process
 - [ ] 6.1 Implement `transcription_worker.py` with `TranscriptionEngine.load_model()` (blueprint §2.3.1).
 - [ ] 6.2 Add `get_plain_transcription` & `get_detailed_transcription` APIs.
+    - [ ] 6.2.1 Ensure `get_detailed_transcription` uses the `timestamps=True` flag in the `transcribe()` call as per latest NeMo docs.
 - [ ] 6.3 Warm-up run after model load to reduce first-call latency.
 - [ ] 6.4 Handle CUDA OOM gracefully; return structured error via IPC.
 - [ ] 6.5 Bench-mark RTFx on sample audio (< 2 s target).
@@ -97,6 +102,7 @@
 - [ ] 16.1 Write `installer.cfg` referencing bundled wheel versions.
 - [ ] 16.2 Build `.exe` installer; verify silent install & uninstall flows.
 - [ ] 16.3 Add Post-install step to pin Start-up shortcut.
+- [ ] 16.4 Verify installer bundles or correctly handles system dependencies (`sox`, `ffmpeg`).
 
 ## 17  Cursor Rule & Automation
 - [ ] 17.1 Draft `progress_tracker.mdc` rule file (ties to Task 0.1).
