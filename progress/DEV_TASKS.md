@@ -47,7 +47,7 @@
 - [x] 2.3 Unit-test save/load round-trip for `ConfigManager`. (commit: config-tests)
 
 ## 3  Resource Helper Utilities
-- [ ] 3.1 Add `resource_manager.py` with `resource_path()` helper for frozen/ dev modes.
+- [x] 3.1 Add `resource_manager.py` with `resource_path()` helper for frozen/ dev modes. (commit: resource-manager-impl)
 - [ ] 3.2 Write unit test covering both frozen & non-frozen path resolution.
 
 ## 4  Audio Capture & VAD Gate
