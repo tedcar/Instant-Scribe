@@ -45,7 +45,7 @@
 
 ## 2  Logging & Configuration Framework
 - [ ] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`).
-- [ ] 2.2 Develop `config_manager.py` with default settings & JSON persistence (see PRD §4.1).
+- [x] 2.2 Develop `config_manager.py` with default settings & JSON persistence (see PRD §4.1). (commit: config-manager-impl)
 - [ ] 2.3 Unit-test save/load round-trip for `ConfigManager`.
 
 ## 3  Resource Helper Utilities
