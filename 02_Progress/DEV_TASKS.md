@@ -44,7 +44,7 @@
 - [x] 1.13 Fix NeMo ASR import (install missing secondary deps, pin compatible versions) and turn NeMo ASR line green. (commit: env-fix-nemo-asr)
 
 ## 2  Logging & Configuration Framework
-- [ ] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`).
+- [x] 2.1 Implement `logging_config.py` that initialises rotating file logger (`logs/app.log`). (commit: logging-config)
 - [ ] 2.2 Develop `config_manager.py` with default settings & JSON persistence (see PRD §4.1).
 - [ ] 2.3 Unit-test save/load round-trip for `ConfigManager`.
 
