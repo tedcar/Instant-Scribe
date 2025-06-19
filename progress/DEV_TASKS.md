@@ -47,8 +47,8 @@
 - [x] 2.3 Unit-test save/load round-trip for `ConfigManager`. (commit: config-tests)
 
 ## 3  Resource Helper Utilities
-- [ ] 3.1 Add `resource_manager.py` with `resource_path()` helper for frozen/ dev modes.
-- [ ] 3.2 Write unit test covering both frozen & non-frozen path resolution.
+- [x] 3.1 Add `resource_manager.py` with `resource_path()` helper for frozen/ dev modes. (commit: resource-manager-impl)
+- [x] 3.2 Write unit test covering both frozen & non-frozen path resolution. (commit: resource-manager-tests)
 
 ## 4  Audio Capture & VAD Gate
 - [ ] 4.1 Create `audio_listener.py` with `AudioStreamer` class (blueprint §3.1.1).
