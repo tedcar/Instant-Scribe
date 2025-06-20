@@ -80,9 +80,9 @@
 - [x] 8.3 Bind menu actions to same callbacks as hotkeys. (commit: tray-ui-impl)
 
 ## 9  Notification Manager
-- [ ] 9.1 Create `notification_manager.py` using `windows-toasts`.
-- [ ] 9.2 Implement clickable action to copy transcription to clipboard (`pyperclip`).
-- [ ] 9.3 Fallback path: log warning if WinRT unavailable.
+- [x] 9.1 Create `notification_manager.py` using `windows-toasts`. (commit: notification-manager-impl)
+- [x] 9.2 Implement clickable action to copy transcription to clipboard (`pyperclip`). (commit: notification-manager-impl)
+- [x] 9.3 Fallback path: log warning if WinRT unavailable. (commit: notification-manager-impl)
 
 ## 10  Application Orchestrator
 - [ ] 10.1 Build `instant_scribe.py` main script that spins up threads/processes & event loop.
