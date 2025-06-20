@@ -70,9 +70,9 @@
 - [x] 6.5 Bench-mark RTFx on sample audio (< 2 s target). (commit: transcription-worker-impl)
 
 ## 7  Global Hotkey Manager
-- [ ] 7.1 Create `hotkey_manager.py` wrapping `keyboard` library with start/stop.
-- [ ] 7.2 Load hotkey string from config; provide runtime reload.
-- [ ] 7.3 Conflict detection: warn if registration fails.
+- [x] 7.1 Create `hotkey_manager.py` wrapping `keyboard` library with start/stop. (commit: hotkey-manager-impl)
+- [x] 7.2 Load hotkey string from config; provide runtime reload. (commit: hotkey-manager-impl)
+- [x] 7.3 Conflict detection: warn if registration fails. (commit: hotkey-manager-impl)
 
 ## 8  System Tray UI
 - [ ] 8.1 Design 32×32 & 16×16 icon assets (`assets/icon.ico`).
