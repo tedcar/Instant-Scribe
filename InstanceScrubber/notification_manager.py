@@ -14,8 +14,7 @@ Core features (Task 9):
     • fallback path that avoids hard dependency on WinRT
 """
 
-from types import TracebackType
-from typing import Any, Callable, Optional, Type
+from typing import Callable, Optional
 import logging
 
 # ---------------------------------------------------------------------------
@@ -34,9 +33,7 @@ except Exception as exc:  # pragma: no cover – not an error, we fall back
 
 import pyperclip  # Copy-to-clipboard backend (cross-platform)
 
-__all__ = [
-    "NotificationManager",
-]
+__all__ = ["NotificationManager"]
 
 
 class NotificationManager:  # pylint: disable=too-few-public-methods
