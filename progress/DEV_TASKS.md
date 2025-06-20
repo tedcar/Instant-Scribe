@@ -100,9 +100,9 @@
 - [x] 12.3 Add CLI flag `--recover` to force resume logic in tests. (commit: task12-spooler)
 
 ## 13  Archive Manager
-- [ ] 13.1 Implement session folder naming (`[n]_[YYYY-MM-DD_HH-MM-SS]`).
-- [ ] 13.2 Write `.wav` original & generated `.txt` with first-7-words filename.
-- [ ] 13.3 Unit-test naming collisions & unicode handling.
+- [x] 13.1 Implement session folder naming (`[n]_[YYYY-MM-DD_HH-MM-SS]`). (commit: archive-manager-impl)
+- [x] 13.2 Write `.wav` original & generated `.txt` with first-7-words filename. (commit: archive-manager-impl)
+- [x] 13.3 Unit-test naming collisions & unicode handling. (commit: archive-manager-tests)
 
 ## 14  Watchdog & Autostart
 - [ ] 14.1 Create `watchdog.pyw` launching `instant_scribe.py` & relaunch on exit.
