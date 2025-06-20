@@ -110,10 +110,10 @@
 - [ ] 14.3 PowerShell script to register watchdog in Windows startup.
 
 ## 15  Packaging – PyInstaller (depends on Tasks 1–14 completed)
-- [ ] 15.1 Generate initial `Instant Scribe.spec` with `--noconsole`.
-- [ ] 15.2 Customise `datas` to include Parakeet model cache.
-- [ ] 15.3 Implement `resource_path` calls throughout codebase.
-- [ ] 15.4 Produce first working `dist/Instant Scribe/Instant Scribe.exe`.
+- [x] 15.1 Generate initial `Instant Scribe.spec` with `--noconsole`. (commit: packaging-impl)
+- [x] 15.2 Customise `datas` to include Parakeet model cache. (commit: packaging-impl)
+- [x] 15.3 Implement `resource_path` calls throughout codebase. (commit: packaging-impl)
+- [x] 15.4 Produce first working `dist/Instant Scribe/Instant Scribe.exe`. (commit: packaging-impl)
 
 ## 16  Installer – Pynsist (depends on Task 15 completed)
 - [ ] 16.1 Write `installer.cfg` referencing bundled wheel versions.
@@ -122,8 +122,9 @@
 - [ ] 16.4 Verify installer bundles or correctly handles system dependencies (`sox`, `ffmpeg`).
 
 ## 17  Cursor Rule & Automation
-- [ ] 17.1 Draft `progress_tracker.mdc` rule file (ties to Task 0.1).
+- [x] 17.1 Draft `progress_tracker.mdc` rule file (ties to Task 0.1). (commit: rules-structure)
 - [ ] 17.2 Add CI job that fails build if any unchecked task references older than 30 days.
+- [x] 17.3 Add `clean_code.mdc` rule enforcing formatting, import hygiene & repository tidiness. (commit: rules-clean-code)
 
 ## 18  Quality Assurance
 - [ ] 18.1 Write pytest suite (>= 80 % coverage gate).
