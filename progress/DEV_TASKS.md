@@ -62,12 +62,12 @@
 - [x] 5.3 Integration test: enqueue dummy audio, expect echo response. (commit: ipc-impl)
 
 ## 6  Transcription Worker Process
-- [ ] 6.1 Implement `transcription_worker.py` with `TranscriptionEngine.load_model()` (blueprint §2.3.1).
-- [ ] 6.2 Add `get_plain_transcription` & `get_detailed_transcription` APIs.
-    - [ ] 6.2.1 Ensure `get_detailed_transcription` uses the `timestamps=True` flag in the `transcribe()` call as per latest NeMo docs.
-- [ ] 6.3 Warm-up run after model load to reduce first-call latency.
-- [ ] 6.4 Handle CUDA OOM gracefully; return structured error via IPC.
-- [ ] 6.5 Bench-mark RTFx on sample audio (< 2 s target).
+- [x] 6.1 Implement `transcription_worker.py` with `TranscriptionEngine.load_model()` (blueprint §2.3.1). (commit: transcription-worker-impl)
+- [x] 6.2 Add `get_plain_transcription` & `get_detailed_transcription` APIs. (commit: transcription-worker-impl)
+    - [x] 6.2.1 Ensure `get_detailed_transcription` uses the `timestamps=True` flag in the `transcribe()` call as per latest NeMo docs. (commit: transcription-worker-impl)
+- [x] 6.3 Warm-up run after model load to reduce first-call latency. (commit: transcription-worker-impl)
+- [x] 6.4 Handle CUDA OOM gracefully; return structured error via IPC. (commit: transcription-worker-impl)
+- [x] 6.5 Bench-mark RTFx on sample audio (< 2 s target). (commit: transcription-worker-impl)
 
 ## 7  Global Hotkey Manager
 - [ ] 7.1 Create `hotkey_manager.py` wrapping `keyboard` library with start/stop.
