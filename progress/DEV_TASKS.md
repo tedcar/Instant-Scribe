@@ -127,9 +127,9 @@
 - [x] 17.3 Add `clean_code.mdc` rule enforcing formatting, import hygiene & repository tidiness. (commit: rules-clean-code)
 
 ## 18  Quality Assurance
-- [ ] 18.1 Write pytest suite (>= 80 % coverage gate).
-- [ ] 18.2 Integration test recording-to-clipboard happy path.
-- [ ] 18.3 Load-test long (30 min) recording – ensure memory stable.
+- [x] 18.1 Write pytest suite (>= 80 % coverage gate). (commit: task18-qa-suite)
+- [x] 18.2 Integration test recording-to-clipboard happy path. (commit: task18-qa-suite)
+- [x] 18.3 Load-test long (30 min) recording – ensure memory stable. (commit: task18-qa-suite)
 
 ## 19  Continuous Integration & Delivery
 - [ ] 19.1 Configure GitHub Actions: lint, test, build executable, upload artefact.
