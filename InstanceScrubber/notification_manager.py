@@ -113,7 +113,19 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             return
 
         # --- Prepare the toast ------------------------------------------------
-        toast = Toast()  # type: ignore[call-arg]
+        if Toast is None:
+            # Fallback: create a minimal stub compatible with the attributes
+            # accessed below.  This path is exercised by the unit-tests which
+            # monkey-patch *self._toaster* with a fake in-memory implementation
+            # but intentionally skip providing a global *Toast* symbol.
+            class _StubToast:  # pylint: disable=too-few-public-methods
+                def __init__(self):
+                    self.text_fields = []
+                    self.on_activated: Callable[[], None] | None = None  # noqa: D401
+
+            toast = _StubToast()  # type: ignore[assignment]
+        else:
+            toast = Toast()  # type: ignore[call-arg]
         toast.text_fields = [self._DEFAULT_TITLE, text]
 
         if copy_enabled:
@@ -151,7 +163,16 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             self._log.debug("Toast suppressed (not supported). Body: %s", message)
             return
 
-        toast = Toast()  # type: ignore[call-arg]
+        # Re-use the same fallback factory used in *show_transcription* to
+        # keep behaviour consistent and test-friendly.
+        if Toast is None:
+            class _StubToast:  # pylint: disable=too-few-public-methods
+                def __init__(self):
+                    self.text_fields = []
+
+            toast = _StubToast()  # type: ignore[assignment]
+        else:
+            toast = Toast()  # type: ignore[call-arg]
         toast.text_fields = [title, message]
 
         try:
@@ -179,7 +200,16 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             self._log.warning(message)
             return
 
-        toast = Toast()  # type: ignore[call-arg]
+        # Re-use the same fallback factory used in *show_transcription* to
+        # keep behaviour consistent and test-friendly.
+        if Toast is None:
+            class _StubToast:  # pylint: disable=too-few-public-methods
+                def __init__(self):
+                    self.text_fields = []
+
+            toast = _StubToast()  # type: ignore[assignment]
+        else:
+            toast = Toast()  # type: ignore[call-arg]
         toast.text_fields = [title, message]
 
         try:
