@@ -85,9 +85,9 @@
 - [x] 9.3 Fallback path: log warning if WinRT unavailable. (commit: notification-manager-impl)
 
 ## 10  Application Orchestrator
-- [ ] 10.1 Build `instant_scribe.py` main script that spins up threads/processes & event loop.
-- [ ] 10.2 Implement graceful shutdown: flush queues, stop audio, join processes.
-- [ ] 10.3 Global `sys.excepthook` → `crash.log` (PRD §4.3.4).
+- [x] 10.1 Build `instant_scribe` orchestrator that spins up threads/processes & event loop. (commit: orchestrator-impl)
+- [x] 10.2 Implement graceful shutdown: flush queues, stop audio, join processes. (commit: orchestrator-impl)
+- [x] 10.3 Global `sys.excepthook` → `crash.log` (PRD §4.3.4). (commit: orchestrator-impl)
 
 ## 11  VRAM Toggle Feature
 - [ ] 11.1 Expose `Ctrl+Alt+F6` hotkey to unload/reload model via worker IPC.
