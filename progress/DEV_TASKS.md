@@ -132,8 +132,8 @@
 - [x] 18.3 Load-test long (30 min) recording – ensure memory stable. (commit: task18-qa-suite)
 
 ## 19  Continuous Integration & Delivery
-- [ ] 19.1 Configure GitHub Actions: lint, test, build executable, upload artefact.
-- [ ] 19.2 Tag releases & attach installer to GitHub Releases page.
+- [x] 19.1 Configure GitHub Actions: lint, test, build executable, upload artefact. (commit: ci-pipeline-impl)
+- [x] 19.2 Tag releases & attach installer to GitHub Releases page. (commit: ci-pipeline-impl)
 
 ## 20  Documentation & Support
 - [ ] 20.1 Update `README.md` with user quick-start & hotkey list.
