@@ -65,9 +65,13 @@ class _StubTray:
 class _StubNotify:
     def __init__(self, *_, **__):  # noqa: D401 – stub
         self.messages = []
+        self.model_states = []
 
     def show_transcription(self, text: str, **_):  # noqa: D401 – signature match
         self.messages.append(text)
+
+    def show_model_state(self, state: str):  # noqa: D401 – stub
+        self.model_states.append(state)
 
 
 # 5. Stub TranscriptionWorker – instant response
@@ -87,6 +91,13 @@ class _StubWorker:
     def transcribe(self, audio_pcm: bytes, **__) -> EngineResponse:  # noqa: D401 – stub
         # Return deterministic payload regardless of input
         return EngineResponse(ok=True, payload="stub transcript")
+
+    # VRAM toggle stubs
+    def unload_model(self, **__) -> EngineResponse:  # noqa: D401 – stub
+        return EngineResponse(ok=True, payload={"state": "unloaded"})
+
+    def load_model(self, **__) -> EngineResponse:  # noqa: D401 – stub
+        return EngineResponse(ok=True, payload={"state": "loaded"})
 
 
 @pytest.fixture(autouse=True)

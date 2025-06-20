@@ -14,6 +14,8 @@ __all__ = [
     "Message",
     "Transcribe",
     "Shutdown",
+    "UnloadModel",
+    "LoadModel",
     "Response",
 ]
 
@@ -37,6 +39,16 @@ class Shutdown(Message):
     """Signal the worker to perform a graceful shutdown."""
 
     reason: str | None = None
+
+
+@dataclass(slots=True)
+class UnloadModel(Message):
+    """Request the worker to *unload* the ASR model from VRAM."""
+
+
+@dataclass(slots=True)
+class LoadModel(Message):
+    """Request the worker to (re)-load the ASR model into VRAM."""
 
 
 @dataclass(slots=True)

@@ -43,6 +43,37 @@ __all__ = [
 ]
 
 
+class _ConfigKeyAdapter:  # pylint: disable=too-few-public-methods
+    """Light wrapper exposing a *single* config key as *hotkey* for reuse by
+    :class:`InstanceScrubber.hotkey_manager.HotkeyManager`.
+
+    The adapter delegates *get* / *set* / *reload* to the underlying
+    :class:`instant_scribe.config_manager.ConfigManager` instance but maps the
+    requested key to an alternative (e.g. *model_hotkey*).  This avoids any
+    changes to the `HotkeyManager` implementation while still supporting
+    multiple distinct hotkey bindings.
+    """
+
+    def __init__(self, base_cfg: ConfigManager, mapped_key: str):
+        self._cfg = base_cfg
+        self._key = mapped_key
+
+    # -- Dict-like interface expected by HotkeyManager ------------------
+    def get(self, key, default=None):  # noqa: D401 – signature match
+        if key == "hotkey":
+            return self._cfg.get(self._key, default)
+        return self._cfg.get(key, default)
+
+    def set(self, key, value, *, auto_save=True):  # noqa: D401
+        if key == "hotkey":
+            self._cfg.set(self._key, value, auto_save=auto_save)
+        else:
+            self._cfg.set(key, value, auto_save=auto_save)
+
+    def reload(self):  # noqa: D401 – proxy
+        self._cfg.reload()
+
+
 class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
     """High-level *application orchestrator* tying all components together."""
 
@@ -72,6 +103,17 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             on_speech_end=self._on_speech_end,
         )
         self.hotkey_manager = HotkeyManager(self.config, on_activate=self._toggle_listening)
+
+        # VRAM toggle hotkey (Ctrl+Alt+F6)
+        vram_cfg_adapter = _ConfigKeyAdapter(self.config, "model_hotkey")
+        self.vram_hotkey_manager = HotkeyManager(
+            vram_cfg_adapter,
+            on_activate=self._toggle_model_vram,
+        )
+
+        # Track current model residency state – starts *loaded* because the
+        # worker loads the model during *start()*.
+        self._model_loaded: bool = True
         self.tray_app = TrayApp(
             self.config,
             on_toggle_listening=self._toggle_listening,
@@ -113,6 +155,13 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         except Exception as exc:  # pylint: disable=broad-except
             self._log.warning("Hotkey manager failed: %s", exc)
 
+        # Start the VRAM toggle hotkey – failure is non-fatal.
+        try:
+            if not self.vram_hotkey_manager.start():
+                self._log.warning("VRAM toggle hotkey unavailable – model must be managed via UI/API")
+        except Exception as exc:  # pylint: disable=broad-except
+            self._log.debug("VRAM hotkey init error: %s", exc)
+
         try:
             if not self.tray_app.start():
                 self._log.info("System-tray UI disabled (headless environment)")
@@ -146,6 +195,11 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
         try:
             self.hotkey_manager.stop()
+        except Exception:
+            pass
+
+        try:
+            self.vram_hotkey_manager.stop()
         except Exception:
             pass
 
@@ -228,6 +282,36 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
     def _handle_signal(self, signum: int, _frame: Any) -> None:  # noqa: D401 – signal handler
         self._log.info("Signal %s received – initiating shutdown.", signum)
         self.shutdown()
+
+    # .................................................................
+    def _toggle_model_vram(self) -> None:
+        """Callback bound to *Ctrl+Alt+F6* – unload/reload the ASR model."""
+
+        with self._lock:
+            if self._model_loaded:
+                # Request unload
+                try:
+                    resp = self.worker.unload_model(timeout=30)
+                    if resp.ok:
+                        self._model_loaded = False
+                        self.notification_manager.show_model_state("unloaded")
+                        self._log.info("ASR model unloaded from VRAM")
+                    else:
+                        self._log.error("Unload model failed: %s", resp.payload)
+                except Exception as exc:  # pylint: disable=broad-except
+                    self._log.error("Error unloading model: %s", exc)
+            else:
+                # Request load
+                try:
+                    resp = self.worker.load_model(timeout=120)
+                    if resp.ok:
+                        self._model_loaded = True
+                        self.notification_manager.show_model_state("loaded")
+                        self._log.info("ASR model loaded into VRAM")
+                    else:
+                        self._log.error("Load model failed: %s", resp.payload)
+                except Exception as exc:  # pylint: disable=broad-except
+                    self._log.error("Error loading model: %s", exc)
 
 
 # ---------------------------------------------------------------------------

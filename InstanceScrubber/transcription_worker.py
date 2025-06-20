@@ -115,6 +115,33 @@ class TranscriptionEngine:  # pylint: disable=too-many-public-methods
         except Exception as exc:  # pragma: no cover – warm-up failures non-fatal
             logging.warning("Warm-up inference failed: %s", exc)
 
+    def unload_model(self) -> None:  # noqa: D401 – imperative API
+        """Free GPU/CPU memory by discarding the loaded model.
+
+        When running on a CUDA-capable system we explicitly call
+        ``torch.cuda.empty_cache()`` after deleting the model reference so
+        that VRAM is returned immediately.  The call is wrapped in a *try*
+        block so the method becomes a no-op on systems without PyTorch / GPU
+        support (stub mode, CI, etc.).
+        """
+
+        if self.model is None:
+            return  # Already unloaded – idempotent
+
+        # Drop the strong reference first so Python can reclaim memory.
+        _tmp = self.model
+        self.model = None
+        del _tmp  # noqa: PLW0127 – explicit cleanup for clarity
+
+        # If torch is available attempt to clear the CUDA allocator cache.
+        try:
+            import torch  # pylint: disable=import-error,import-outside-toplevel
+
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except Exception:  # pragma: no cover – soft-fail in stub/CPU env
+            pass
+
     # ------------------------------------------------------------------
     # Public inference APIs
     # ------------------------------------------------------------------
@@ -192,7 +219,7 @@ class TranscriptionError(Exception):  # pylint: disable=too-few-public-methods
 # ---------------------------------------------------------------------------
 
 import multiprocessing as _mp
-from ipc.messages import Shutdown, Transcribe, Response  # noqa: E402 – avoid circular at top
+from ipc.messages import Shutdown, Transcribe, Response, UnloadModel, LoadModel  # noqa: E402 – avoid circular at top
 from ipc.queue_wrapper import IPCQueue  # noqa: E402
 
 
@@ -220,6 +247,28 @@ def _worker_process(request_q: _mp.Queue, response_q: _mp.Queue, *, use_stub: bo
                 response_q.put(Response(result=EngineResponse(ok=True, payload=text)))
             except Exception as exc:  # pylint: disable=broad-except – robustness
                 logging.exception("Transcription failed: %s", exc)
+                response_q.put(
+                    Response(result=EngineResponse(ok=False, payload={"error": str(exc)}))
+                )
+        elif isinstance(msg, UnloadModel):
+            try:
+                engine.unload_model()
+                response_q.put(
+                    Response(result=EngineResponse(ok=True, payload={"state": "unloaded"}))
+                )
+            except Exception as exc:  # pragma: no cover – unexpected
+                logging.exception("Unload model failed: %s", exc)
+                response_q.put(
+                    Response(result=EngineResponse(ok=False, payload={"error": str(exc)}))
+                )
+        elif isinstance(msg, LoadModel):
+            try:
+                engine.load_model(use_stub=use_stub)
+                response_q.put(
+                    Response(result=EngineResponse(ok=True, payload={"state": "loaded"}))
+                )
+            except Exception as exc:  # pragma: no cover
+                logging.exception("Load model failed: %s", exc)
                 response_q.put(
                     Response(result=EngineResponse(ok=False, payload={"error": str(exc)}))
                 )
@@ -266,6 +315,26 @@ class TranscriptionWorker:
     def transcribe(self, audio_pcm: bytes, *, timeout: float | None = 30) -> EngineResponse:
         """Synchronous convenience wrapper – send audio and wait for result."""
         self._requests.put(Transcribe(audio=audio_pcm))
+        resp: Response[EngineResponse] = self._responses.get(timeout=timeout)
+        return resp.result
+
+    # ------------------------------------------------------------------
+    # VRAM toggle helpers (Task 11)
+    # ------------------------------------------------------------------
+
+    def unload_model(self, *, timeout: float | None = 30) -> EngineResponse:
+        """Request the worker to unload the ASR model and wait for acknowledgement."""
+        from ipc.messages import UnloadModel  # local import avoids circularity
+
+        self._requests.put(UnloadModel())
+        resp: Response[EngineResponse] = self._responses.get(timeout=timeout)
+        return resp.result
+
+    def load_model(self, *, timeout: float | None = 120) -> EngineResponse:
+        """Request the worker to (re)load the ASR model back into VRAM."""
+        from ipc.messages import LoadModel  # local import avoids circularity
+
+        self._requests.put(LoadModel())
         resp: Response[EngineResponse] = self._responses.get(timeout=timeout)
         return resp.result
 

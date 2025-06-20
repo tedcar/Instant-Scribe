@@ -128,6 +128,38 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             self._log.warning("Failed to display toast: %s", exc)
 
     # ------------------------------------------------------------------
+    # VRAM toggle helpers (Task 11)
+    # ------------------------------------------------------------------
+
+    def show_model_state(self, state: str) -> None:  # noqa: D401 – imperative API
+        """Display a toast reflecting the current *model VRAM* state.
+
+        Parameters
+        ----------
+        state
+            Either ``"loaded"`` or ``"unloaded"``.  Any other string will be
+            passed through verbatim.
+        """
+
+        title = "Instant Scribe"
+        message = (
+            "Model loaded and ready." if state == "loaded" else "Model unloaded from VRAM."
+            if state == "unloaded" else str(state)
+        )
+
+        if not self._toaster:
+            self._log.debug("Toast suppressed (not supported). Body: %s", message)
+            return
+
+        toast = Toast()  # type: ignore[call-arg]
+        toast.text_fields = [title, message]
+
+        try:
+            self._toaster.show_toast(toast)  # type: ignore[arg-type]
+        except Exception as exc:  # pragma: no cover – runtime path
+            self._log.warning("Failed to display toast: %s", exc)
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
     @staticmethod

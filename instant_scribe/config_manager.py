@@ -18,6 +18,7 @@ class ConfigManager:
     #: Default configuration values shipped with Instant Scribe.
     DEFAULTS: Dict[str, Any] = {
         "hotkey": "ctrl+alt+f",
+        "model_hotkey": "ctrl+alt+f6",
         "vad_aggressiveness": 2,
         "silence_threshold_ms": 120000,  # 2 minutes default threshold per PRD §3.2.5
         "batch_length_ms": 600000,       # 10-minute batches (Task 21 requirement)

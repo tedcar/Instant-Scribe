@@ -90,9 +90,9 @@
 - [x] 10.3 Global `sys.excepthook` → `crash.log` (PRD §4.3.4). (commit: orchestrator-impl)
 
 ## 11  VRAM Toggle Feature
-- [ ] 11.1 Expose `Ctrl+Alt+F6` hotkey to unload/reload model via worker IPC.
-- [ ] 11.2 Emit toast notifications reflecting state.
-- [ ] 11.3 Regression test ensuring memory freed (use `nvidia-smi` snapshot).
+- [x] 11.1 Expose `Ctrl+Alt+F6` hotkey to unload/reload model via worker IPC. (commit: vram-toggle-impl)
+- [x] 11.2 Emit toast notifications reflecting state. (commit: vram-toggle-impl)
+- [x] 11.3 Regression test ensuring memory freed (use `nvidia-smi` snapshot). (commit: vram-toggle-impl)
 
 ## 12  Persistence – "Never Lose a Word"
 - [ ] 12.1 Implement spooler writing numbered PCM chunks to `%APPDATA%/Instant Scribe/temp`.
