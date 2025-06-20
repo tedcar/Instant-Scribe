@@ -57,9 +57,9 @@
 - [x] 4.4 Write unit tests simulating audio frames to validate gate behaviour. (commit: audio-listener-impl)
 
 ## 5  Inter-Process Queues & Message Protocol
-- [ ] 5.1 Define `ipc/messages.py` with typed dataclasses for commands (`Transcribe`, `Shutdown`, etc.).
-- [ ] 5.2 Prototype simple `multiprocessing.Queue` wrapper with timeout & error propagation.
-- [ ] 5.3 Integration test: enqueue dummy audio, expect echo response.
+- [x] 5.1 Define `ipc/messages.py` with typed dataclasses for commands (`Transcribe`, `Shutdown`, etc.). (commit: ipc-impl)
+- [x] 5.2 Prototype simple `multiprocessing.Queue` wrapper with timeout & error propagation. (commit: ipc-impl)
+- [x] 5.3 Integration test: enqueue dummy audio, expect echo response. (commit: ipc-impl)
 
 ## 6  Transcription Worker Process
 - [ ] 6.1 Implement `transcription_worker.py` with `TranscriptionEngine.load_model()` (blueprint §2.3.1).

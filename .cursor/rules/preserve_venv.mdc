@@ -3,3 +3,27 @@ description:
 globs:
 alwaysApply: false
 ---
+- **Never rebuild, delete or modify the `.venv` directory**
+  - The current virtual-environment is considered the **source of truth** for library versions.
+  - Do **not** rerun `scripts/setup_env.ps1`, `pip install`, `pip-compile`, or any similar commands **unless the user explicitly instructs so.**
+
+- **Preserve existing Python/CUDA libraries**
+  - No upgrades/downgrades of PyTorch, NumPy, CUDA-toolkit, etc.
+  - If a task seems to require a new library, *ask the user first*.
+
+- **Allowed actions**
+  - Downloading or updating model weights (e.g., Parakeet STT checkpoints) located outside `.venv`.
+  - Running application code that merely *uses* the installed libraries.
+
+- **Example – allowed**
+  ```powershell
+  # Pull updated Parakeet model
+  python download_model.py --refresh
+  ```
+
+- **Example – forbidden**
+  ```powershell
+  # ❌ would violate the rule
+  pip install --upgrade torch
+  rm -r .venv && scripts/setup_env.ps1
+  ```
