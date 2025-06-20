@@ -278,31 +278,59 @@ class TranscriptionWorker:
     """Facade managing the background worker process."""
 
     def __init__(self, *, use_stub: bool = False):
-        self._requests: IPCQueue[Any] = IPCQueue()
-        self._responses: IPCQueue[Any] = IPCQueue()
-        self._proc: _mp.Process | None = None
         self._use_stub = use_stub
+
+        # *Optimization for test environments*: when running in *stub* mode we
+        # avoid the expensive Windows **multiprocessing spawn** overhead by
+        # executing the `TranscriptionEngine` directly inside the parent
+        # process.  This keeps unit-tests snappy and eliminates flaky
+        # timeouts when the CI runner is under heavy load.
+        if use_stub:
+            self._inline_engine = TranscriptionEngine()
+            self._inline_engine.load_model(use_stub=True)
+            self._proc = None  # type: ignore[assignment]
+            self._requests = None  # type: ignore[assignment]
+            self._responses = None  # type: ignore[assignment]
+        else:
+            self._inline_engine = None  # type: ignore[attr-defined]
+            self._requests: IPCQueue[Any] = IPCQueue()
+            self._responses: IPCQueue[Any] = IPCQueue()
+            self._proc: _mp.Process | None = None
 
     # ------------------------------------------------------------------
     # Public helpers
     # ------------------------------------------------------------------
 
     def start(self) -> None:
-        """Spawn the worker process if not already running."""
+        """Initialise the worker – spawn a *separate* process unless we are
+        running in the fast *inline stub* mode used by unit-tests."""
+
+        if self._use_stub:
+            # Inline mode – nothing to spawn.
+            return
+
         if self._proc and self._proc.is_alive():
             logging.debug("Worker already running – start() ignored")
             return
+
         ctx = _mp.get_context("spawn")
         self._proc = ctx.Process(
             target=_worker_process,
             args=(self._requests.raw, self._responses.raw),
-            kwargs={"use_stub": self._use_stub},
+            kwargs={"use_stub": False},
         )
         self._proc.start()
         logging.info("Transcription worker process started (pid=%d)", self._proc.pid)
 
     def stop(self, *, reason: str = "normal shutdown") -> None:
-        """Terminate the worker process gracefully."""
+        """Terminate the worker process gracefully (no-op for inline stub)."""
+
+        if self._use_stub:
+            # Free model memory to simulate *unload* on shutdown.
+            if self._inline_engine:
+                self._inline_engine.unload_model()
+            return
+
         if not self._proc:
             return
         self._requests.put(Shutdown(reason=reason))
@@ -313,7 +341,22 @@ class TranscriptionWorker:
         logging.info("Transcription worker stopped")
 
     def transcribe(self, audio_pcm: bytes, *, timeout: float | None = 30) -> EngineResponse:
-        """Synchronous convenience wrapper – send audio and wait for result."""
+        """Synchronous convenience wrapper – transcribe audio and return result.
+
+        In *inline stub* mode we bypass IPC entirely for speed; otherwise the
+        call is proxied to the background worker process via the request
+        queue and blocks until a response is received or *timeout* expires.
+        """
+
+        if self._use_stub:
+            assert self._inline_engine is not None  # for type checker
+            try:
+                audio_np = np.frombuffer(audio_pcm, dtype=np.int16)
+                text = self._inline_engine.get_plain_transcription(audio_np)
+                return EngineResponse(ok=True, payload=text)
+            except Exception as exc:  # pragma: no cover – stub path safety
+                return EngineResponse(ok=False, payload={"error": str(exc)})
+
         self._requests.put(Transcribe(audio=audio_pcm))
         resp: Response[EngineResponse] = self._responses.get(timeout=timeout)
         return resp.result
@@ -323,7 +366,16 @@ class TranscriptionWorker:
     # ------------------------------------------------------------------
 
     def unload_model(self, *, timeout: float | None = 30) -> EngineResponse:
-        """Request the worker to unload the ASR model and wait for acknowledgement."""
+        """Unload the ASR model (inline stub or background worker)."""
+
+        if self._use_stub:
+            assert self._inline_engine is not None
+            try:
+                self._inline_engine.unload_model()
+                return EngineResponse(ok=True, payload={"state": "unloaded"})
+            except Exception as exc:  # pragma: no cover
+                return EngineResponse(ok=False, payload={"error": str(exc)})
+
         from ipc.messages import UnloadModel  # local import avoids circularity
 
         self._requests.put(UnloadModel())
@@ -331,7 +383,16 @@ class TranscriptionWorker:
         return resp.result
 
     def load_model(self, *, timeout: float | None = 120) -> EngineResponse:
-        """Request the worker to (re)load the ASR model back into VRAM."""
+        """Reload the ASR model after *unload* (inline stub or background worker)."""
+
+        if self._use_stub:
+            assert self._inline_engine is not None
+            try:
+                self._inline_engine.load_model(use_stub=True)
+                return EngineResponse(ok=True, payload={"state": "loaded"})
+            except Exception as exc:  # pragma: no cover
+                return EngineResponse(ok=False, payload={"error": str(exc)})
+
         from ipc.messages import LoadModel  # local import avoids circularity
 
         self._requests.put(LoadModel())
