@@ -116,10 +116,10 @@
 - [x] 15.4 Produce first working `dist/Instant Scribe/Instant Scribe.exe`. (commit: packaging-impl)
 
 ## 16  Installer – Pynsist (depends on Task 15 completed)
-- [ ] 16.1 Write `installer.cfg` referencing bundled wheel versions.
-- [ ] 16.2 Build `.exe` installer; verify silent install & uninstall flows.
-- [ ] 16.3 Add Post-install step to pin Start-up shortcut.
-- [ ] 16.4 Verify installer bundles or correctly handles system dependencies (`sox`, `ffmpeg`).
+- [x] 16.1 Write `installer.cfg` referencing bundled wheel versions. (commit: task16-installer)
+- [x] 16.2 Build `.exe` installer; verify silent install & uninstall flows. (commit: task16-installer)
+- [x] 16.3 Add Post-install step to pin Start-up shortcut. (commit: task16-installer)
+- [x] 16.4 Verify installer bundles or correctly handles system dependencies (`sox`, `ffmpeg`). (commit: task16-installer)
 
 ## 17  Cursor Rule & Automation
 - [x] 17.1 Draft `progress_tracker.mdc` rule file (ties to Task 0.1). (commit: rules-structure)
