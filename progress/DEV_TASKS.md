@@ -75,9 +75,9 @@
 - [x] 7.3 Conflict detection: warn if registration fails. (commit: hotkey-manager-impl)
 
 ## 8  System Tray UI
-- [ ] 8.1 Design 32×32 & 16×16 icon assets (`assets/icon.ico`).
-- [ ] 8.2 Implement `tray_app.py` hosting `pystray.Icon` & dynamic menu entries.
-- [ ] 8.3 Bind menu actions to same callbacks as hotkeys.
+- [x] 8.1 Design 32×32 & 16×16 icon assets (`assets/icon.ico`). (commit: tray-ui-impl)
+- [x] 8.2 Implement `tray_app.py` hosting `pystray.Icon` & dynamic menu entries. (commit: tray-ui-impl)
+- [x] 8.3 Bind menu actions to same callbacks as hotkeys. (commit: tray-ui-impl)
 
 ## 9  Notification Manager
 - [ ] 9.1 Create `notification_manager.py` using `windows-toasts`.
