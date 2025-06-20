@@ -136,9 +136,9 @@
 - [x] 19.2 Tag releases & attach installer to GitHub Releases page. (commit: ci-pipeline-impl)
 
 ## 20  Documentation & Support
-- [ ] 20.1 Update `README.md` with user quick-start & hotkey list.
-- [ ] 20.2 Create `docs/TROUBLESHOOTING.md` covering common GPU/driver issues.
-- [ ] 20.3 Generate architecture diagram (`docs/diagram.mmd`) using Mermaid.
+- [x] 20.1 Update `README.md` with user quick-start & hotkey list. (commit: docs-task20)
+- [x] 20.2 Create `docs/TROUBLESHOOTING.md` covering common GPU/driver issues. (commit: docs-task20)
+- [x] 20.3 Generate architecture diagram (`docs/diagram.mmd`) using Mermaid. (commit: docs-task20)
 
 ## 21  Background Batch Transcription
 - [ ] 21.1 Implement `batch_transcriber.py` consuming 10-minute audio slices in parallel during recording.

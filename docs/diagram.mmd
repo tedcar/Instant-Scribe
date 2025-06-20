@@ -1,0 +1,14 @@
+graph TD
+    subgraph "Main Process"
+        UI["Tray App & Hotkey Manager"]
+        Listener["Audio Listener / VAD"]
+    end
+    Worker["Transcription Worker (separate process)"]
+    GPU["GPU VRAM – Parakeet Model"]
+    Watchdog["watchdog.pyw (auto-restart)"]
+
+    UI -->|"User Commands"| Listener
+    Listener -->|"Speech Segments"| Worker
+    Worker -->|"Transcribed Text"| UI
+    Worker --> GPU
+    Watchdog -->|"Launch / Relaunch"| UI 

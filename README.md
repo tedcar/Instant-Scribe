@@ -82,3 +82,26 @@ You should see output similar to:
 ```
 
 If you receive an error, install/upgrade your GPU driver and ensure you used the CUDA-enabled PyTorch wheel.
+
+## Quick Start for End Users
+
+### Installation
+1. Download the latest `InstantScribe_Setup.exe` from the Releases page.
+2. Run the installer **with administrative privileges**. No options need to be changed.
+3. Reboot or sign-out/in. Instant Scribe will launch automatically in the background and display a one-time toast:
+   "Instant Scribe is loaded and ready."
+
+### Daily Use
+• Press **Ctrl + Alt + F** to start recording. Press the same hotkey again to stop and trigger transcription.
+• Press **Ctrl + Alt + F6** to unload (free VRAM) or reload the speech model.
+
+When transcription finishes, a notification "Transcription complete. Text copied to clipboard." appears and the text is already on your clipboard.
+
+## Hotkeys Reference
+
+| Action | Hotkey | Notes |
+| ------ | ------ | ----- |
+| Start / Stop recording | Ctrl + Alt + F | Toggles listening state |
+| Unload / Reload model | Ctrl + Alt + F6 | Frees / allocates ~3 GB GPU VRAM |
+
+> Tip  Advanced users can edit `%APPDATA%\Instant_Scribe\config.json` to customise hotkeys and behaviour.
