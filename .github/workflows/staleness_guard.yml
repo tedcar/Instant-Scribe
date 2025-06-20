@@ -1,0 +1,23 @@
+name: Staleness Guard
+
+on:
+  pull_request:
+    paths:
+      - 'progress/DEV_TASKS.md'
+      - '.github/workflows/staleness_guard.yml'
+      - 'scripts/staleness_guard.py'
+  push:
+    branches: [ main ]
+    paths:
+      - 'progress/DEV_TASKS.md'
+      - '.github/workflows/staleness_guard.yml'
+      - 'scripts/staleness_guard.py'
+
+jobs:
+  check-stale-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run staleness guard
+        run: |
+          python scripts/staleness_guard.py --max-age 30

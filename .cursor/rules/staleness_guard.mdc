@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- **Never let old tasks rot**
+  - The `scripts/staleness_guard.py` tool inspects every `- [ ]` entry in `progress/DEV_TASKS.md`.
+  - If a task line was last edited more than **30 days** ago the CI job defined in `.github/workflows/staleness_guard.yml` fails.
+  - When modifying tasks, touch the corresponding lines (e.g., update wording, bump numbering) so the blame timestamp is refreshed.
+
+- **Updating the threshold**
+  - To change the allowable age, adjust the `--max-age` flag in the CI workflow.
+
+- **Local runs**
+  - Execute `python scripts/staleness_guard.py --max-age 30` before pushing large refactors to avoid surprise CI failures.
+
+- **Testing**
+
+  - Use `GIT_AUTHOR_DATE` and `GIT_COMMITTER_DATE` when crafting commits in tests to simulate age boundaries.
