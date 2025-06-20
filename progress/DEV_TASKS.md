@@ -51,10 +51,10 @@
 - [x] 3.2 Write unit test covering both frozen & non-frozen path resolution. (commit: resource-manager-tests)
 
 ## 4  Audio Capture & VAD Gate
-- [ ] 4.1 Create `audio_listener.py` with `AudioStreamer` class (blueprint §3.1.1).
-- [ ] 4.2 Integrate WebRTC VAD state machine (blueprint §3.1.2); expose events `on_speech_start`, `on_speech_end`.
-- [ ] 4.3 Expose aggressiveness & silence-threshold to `ConfigManager`.
-- [ ] 4.4 Write unit tests simulating audio frames to validate gate behaviour.
+- [x] 4.1 Create `audio_listener.py` with `AudioStreamer` class (blueprint §3.1.1). (commit: audio-listener-impl)
+- [x] 4.2 Integrate WebRTC VAD state machine (blueprint §3.1.2); expose events `on_speech_start`, `on_speech_end`. (commit: audio-listener-impl)
+- [x] 4.3 Expose aggressiveness & silence-threshold to `ConfigManager`. (commit: audio-listener-impl)
+- [x] 4.4 Write unit tests simulating audio frames to validate gate behaviour. (commit: audio-listener-impl)
 
 ## 5  Inter-Process Queues & Message Protocol
 - [ ] 5.1 Define `ipc/messages.py` with typed dataclasses for commands (`Transcribe`, `Shutdown`, etc.).
