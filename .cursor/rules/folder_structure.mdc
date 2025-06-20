@@ -1,10 +1,10 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
-- **Production code must reside in `InstanceScrubber/`**
-  - Any `.py` file outside `InstanceScrubber/` (excluding `tests/`, `scripts/`, or tooling) is a rule violation.
+- **Production code must reside in `InstanceScrubber/` or `instant_scribe/`**
+  - Any `.py` file outside these packages (excluding `tests/`, `scripts/`, or tooling) is a rule violation.
   - Sub-packages are permitted, e.g. `InstanceScrubber/audio/`.
   - Rationale: keeps import paths predictable and supports single-point packaging.
 
