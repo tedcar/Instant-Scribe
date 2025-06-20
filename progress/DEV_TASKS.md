@@ -105,9 +105,9 @@
 - [x] 13.3 Unit-test naming collisions & unicode handling. (commit: archive-manager-tests)
 
 ## 14  Watchdog & Autostart
-- [ ] 14.1 Create `watchdog.pyw` launching `instant_scribe.py` & relaunch on exit.
-- [ ] 14.2 Self-log to `watchdog.log` and back-off 5 s on crash loops.
-- [ ] 14.3 PowerShell script to register watchdog in Windows startup.
+- [x] 14.1 Create `watchdog.pyw` launching `instant_scribe.py` & relaunch on exit. (commit: watchdog-impl)
+- [x] 14.2 Self-log to `watchdog.log` and back-off 5 s on crash loops. (commit: watchdog-impl)
+- [x] 14.3 PowerShell script to register watchdog in Windows startup. (commit: watchdog-impl)
 
 ## 15  Packaging – PyInstaller (depends on Tasks 1–14 completed)
 - [x] 15.1 Generate initial `Instant Scribe.spec` with `--noconsole`. (commit: packaging-impl)
