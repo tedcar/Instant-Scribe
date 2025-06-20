@@ -66,12 +66,16 @@ class _StubNotify:
     def __init__(self, *_, **__):  # noqa: D401 – stub
         self.messages = []
         self.model_states = []
+        self.recovery_prompts = 0
 
     def show_transcription(self, text: str, **_):  # noqa: D401 – signature match
         self.messages.append(text)
 
     def show_model_state(self, state: str):  # noqa: D401 – stub
         self.model_states.append(state)
+
+    def show_recovery_prompt(self):  # noqa: D401 – stub
+        self.recovery_prompts += 1
 
 
 # 5. Stub TranscriptionWorker – instant response

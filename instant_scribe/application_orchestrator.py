@@ -36,6 +36,7 @@ from InstanceScrubber.transcription_worker import (
     EngineResponse,
     TranscriptionWorker,
 )
+from InstanceScrubber.spooler import AudioSpooler  # NEW – Task 12
 
 __all__ = [
     "ApplicationOrchestrator",
@@ -82,7 +83,7 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
     # ---------------------------------------------------------------------
     # Construction helpers
     # ---------------------------------------------------------------------
-    def __init__(self, *, use_stub_worker: bool = False, auto_start: bool = False):
+    def __init__(self, *, use_stub_worker: bool = False, auto_start: bool = False, force_recover: bool = False):
         self._log = logging.getLogger(self.__class__.__name__)
 
         # Public-ish state toggled by UI callbacks / tests
@@ -119,6 +120,20 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             on_toggle_listening=self._toggle_listening,
             on_exit=self.shutdown,
         )
+
+        # Task 12 – persistent audio spooler
+        self.spooler = AudioSpooler()
+
+        # On startup detect incomplete recording and notify user.
+        try:
+            if force_recover or AudioSpooler.incomplete_session_exists():
+                # Leverage notification manager – falls back to log when not supported
+                if hasattr(self.notification_manager, "show_recovery_prompt"):
+                    self.notification_manager.show_recovery_prompt()
+                else:
+                    self._log.warning("Incomplete recording detected – recovery prompt method missing")
+        except Exception as exc:  # pylint: disable=broad-except
+            self._log.debug("Recovery detection failed: %s", exc)
 
         # Install global unhandled-exception hook *before* anything starts so
         # we never miss a traceback.
@@ -171,6 +186,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         # Start microphone listener (may raise if PyAudio missing).
         try:
             self.audio_streamer.start()
+            # Task 12 – begin spooling chunks for this recording session
+            self.spooler.start_session()
             self.is_listening = True
         except Exception as exc:  # pylint: disable=broad-except
             self._log.warning("Audio streamer unavailable – running in *idle* mode: %s", exc)
@@ -213,6 +230,12 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         except Exception:
             pass
 
+        # Task 12 – ensure temp directory is cleaned on graceful exit
+        try:
+            self.spooler.close_session(success=True)
+        except Exception:  # pragma: no cover
+            pass
+
         self._is_running = False
         self._log.info("Shutdown complete")
 
@@ -225,6 +248,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             if self.is_listening:
                 try:
                     self.audio_streamer.stop()
+                    # Task 12 – clean up tmp chunks on normal stop
+                    self.spooler.close_session(success=True)
                     self.is_listening = False
                     self._log.info("Listening stopped via user toggle")
                 except Exception as exc:  # pylint: disable=broad-except
@@ -232,6 +257,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             else:
                 try:
                     self.audio_streamer.start()
+                    # Task 12 – begin spooling chunks for this recording session
+                    self.spooler.start_session()
                     self.is_listening = True
                     self._log.info("Listening started via user toggle")
                 except Exception as exc:  # pylint: disable=broad-except
@@ -243,6 +270,11 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
     def _on_speech_end(self, audio_bytes: bytes) -> None:
         self._log.debug("Speech segment finished –%d bytes", len(audio_bytes))
+        # Task 12 – persist segment to disk before heavy processing
+        try:
+            self.spooler.write_chunk(audio_bytes)
+        except Exception as exc:  # pylint: disable=broad-except
+            self._log.debug("Spooler write failed: %s", exc)
         try:
             resp: EngineResponse = self.worker.transcribe(audio_bytes, timeout=30)
             if resp.ok:
@@ -319,8 +351,40 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 # ---------------------------------------------------------------------------
 
 def main() -> None:  # noqa: D401 – script entry
-    """Launch the orchestrator in *production* mode (real GPU model, etc.)."""
-    ApplicationOrchestrator(use_stub_worker=False, auto_start=True)
+    """Console entry‐point – parses minimal CLI flags then starts the app."""
+
+    import argparse  # local import to avoid startup cost when imported as lib
+
+    parser = argparse.ArgumentParser(description="Instant Scribe launcher")
+    parser.add_argument(
+        "--recover",
+        action="store_true",
+        help="Force recovery prompt even if no incomplete session detected.",
+    )
+    parser.add_argument(
+        "--stub-worker",
+        action="store_true",
+        help="Run with stub (CPU-only) transcription worker – useful for tests.",
+    )
+
+    args = parser.parse_args()
+
+    orchestrator = ApplicationOrchestrator(
+        use_stub_worker=args.stub_worker,
+        auto_start=True,
+        force_recover=args.recover,
+    )
+
+    # Block main thread until CTRL-C.  The tray UI / hotkey threads keep the
+    # process alive.  In headless CI we exit immediately once *start()* has
+    # completed so tests are not blocked.
+    try:
+        import time
+
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:  # pragma: no cover – manual stop
+        orchestrator.shutdown()
 
 
 if __name__ == "__main__":  # pragma: no cover – manual execution helper

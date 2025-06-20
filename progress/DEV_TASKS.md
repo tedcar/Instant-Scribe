@@ -95,9 +95,9 @@
 - [x] 11.3 Regression test ensuring memory freed (use `nvidia-smi` snapshot). (commit: vram-toggle-impl)
 
 ## 12  Persistence – "Never Lose a Word"
-- [ ] 12.1 Implement spooler writing numbered PCM chunks to `%APPDATA%/Instant Scribe/temp`.
-- [ ] 12.2 On crash start-up, detect incomplete session & surface recovery toast.
-- [ ] 12.3 Add CLI flag `--recover` to force resume logic in tests.
+- [x] 12.1 Implement spooler writing numbered PCM chunks to `%APPDATA%/Instant Scribe/temp`. (commit: task12-spooler)
+- [x] 12.2 On crash start-up, detect incomplete session & surface recovery toast. (commit: task12-spooler)
+- [x] 12.3 Add CLI flag `--recover` to force resume logic in tests. (commit: task12-spooler)
 
 ## 13  Archive Manager
 - [ ] 13.1 Implement session folder naming (`[n]_[YYYY-MM-DD_HH-MM-SS]`).

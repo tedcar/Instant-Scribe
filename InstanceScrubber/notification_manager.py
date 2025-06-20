@@ -160,6 +160,34 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             self._log.warning("Failed to display toast: %s", exc)
 
     # ------------------------------------------------------------------
+    # Task 12 – crash recovery prompt
+    # ------------------------------------------------------------------
+
+    def show_recovery_prompt(self) -> None:  # noqa: D401 – imperative API
+        """Inform the user that an incomplete recording was found on disk.
+
+        The full interactive *Yes / No* prompt described in the Final Product
+        Vision is beyond the scope of this initial implementation.  For now
+        we display a simple informational toast so that manual recovery can
+        be initiated via the ``--recover`` CLI flag.
+        """
+
+        title = "Instant Scribe – Recovery"
+        message = "An incomplete recording was found.  Re-launch with --recover to resume."
+
+        if not self._toaster:
+            self._log.warning(message)
+            return
+
+        toast = Toast()  # type: ignore[call-arg]
+        toast.text_fields = [title, message]
+
+        try:
+            self._toaster.show_toast(toast)  # type: ignore[arg-type]
+        except Exception as exc:  # pragma: no cover – runtime path
+            self._log.warning("Failed to display toast: %s", exc)
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
     @staticmethod
