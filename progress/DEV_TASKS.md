@@ -147,9 +147,9 @@
 - [x] 21.4 Integration test: 30-min dummy recording returns text in < 3 s. (commit: task21-batch-transcriber)
 
 ## 22  Silence Removal Pre-Processor
-- [ ] 22.1 Add `silence_pruner.py` that trims > 2 min silence segments prior to transcription.
-- [ ] 22.2 User-configurable silence threshold via config.
-- [ ] 22.3 Unit test ensuring trimmed output length ≤ input length ‑ 2 min silence.
+- [x] 22.1 Add `silence_pruner.py` that trims > 2 min silence segments prior to transcription. (commit: task22-silence-pruner)
+- [x] 22.2 User-configurable silence threshold via config. (commit: task22-silence-pruner)
+- [x] 22.3 Unit test ensuring trimmed output length ≤ input length ‑ 2 min silence. (commit: task22-silence-pruner)
 
 ## 23  Clipboard Robustness
 - [ ] 23.1 Create `clipboard_manager.py` with `copy_with_verification()` and retry logic.

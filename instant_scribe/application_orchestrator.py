@@ -37,6 +37,7 @@ from InstanceScrubber.transcription_worker import (
     TranscriptionWorker,
 )
 from InstanceScrubber.spooler import AudioSpooler  # NEW – Task 12
+from InstanceScrubber.silence_pruner import prune_pcm_bytes
 
 __all__ = [
     "ApplicationOrchestrator",
@@ -275,6 +276,18 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             self.spooler.write_chunk(audio_bytes)
         except Exception as exc:  # pylint: disable=broad-except
             self._log.debug("Spooler write failed: %s", exc)
+        # Task 22 – prune *long* silence segments (>2 min) before GPU inference
+        try:
+            threshold_ms = int(self.config.get("silence_prune_threshold_ms", 120_000))
+            audio_bytes = prune_pcm_bytes(
+                audio_bytes,
+                sample_rate=16_000,
+                threshold_ms=threshold_ms,
+            )
+        except Exception as exc:  # pylint: disable=broad-except
+            # Defensive – pruning failure must never crash the recording path.
+            self._log.debug("Silence pruning failed – falling back to raw audio: %s", exc)
+
         try:
             resp: EngineResponse = self.worker.transcribe(audio_bytes, timeout=30)
             if resp.ok:

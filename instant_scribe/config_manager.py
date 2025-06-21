@@ -21,6 +21,7 @@ class ConfigManager:
         "model_hotkey": "ctrl+alt+f6",
         "vad_aggressiveness": 2,
         "silence_threshold_ms": 120000,  # 2 minutes default threshold per PRD §3.2.5
+        "silence_prune_threshold_ms": 120000,  # Task 22 – long-silence pruning (> 2 min)
         "batch_length_ms": 600000,       # 10-minute batches (Task 21 requirement)
         "batch_overlap_ms": 10000,       # 10-second overlap (Task 21)
         "show_notifications": True,
