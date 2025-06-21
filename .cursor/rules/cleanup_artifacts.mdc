@@ -3,3 +3,24 @@ description:
 globs:
 alwaysApply: false
 ---
+- **Purge temporary text artifacts before committing**
+  - Files matching `*_world*.txt`, `retry_text*.txt`, `aaaaaaaaaa*.txt`, `Hello*.txt`, and other short test/fallback payloads **MUST NOT** be present in Git history.
+  - Their existence indicates a clipboard fallback test wrote to the repository root instead of an isolated temp directory.
+
+- **Allowed locations**
+  - Unit-tests must write fallback files to `tmp_path` or OS temp directories, not to the project root.
+  - Production code may write user-facing fallback files under the configured archive directory, never the repo root.
+
+- **CI enforcement**
+  - A pre-commit hook and CI check should run `git ls-files -o --exclude-standard '*.txt'` and fail if any untracked plain-text artifacts remain.
+  - Developers must delete or .gitignore legitimate user data before pushing.
+
+- **Example**
+  ```bash
+  # ✅ Clean repo – no output
+  git ls-files -o --exclude-standard '*.txt'
+
+  # ❌ Dirty repo – fails CI
+  Hello_world_1.txt
+  retry_text_3.txt
+  ```

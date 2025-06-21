@@ -3,3 +3,22 @@ description:
 globs:
 alwaysApply: false
 ---
+- **Automate housekeeping when tests succeed**
+  - After `pytest` completes with **0 failures** *and* the workspace contains **no untracked dirty files** (except expected build artefacts listed in `.gitignore`), run:
+    ```bash
+    git add -A
+    git commit -m "ci: auto-commit post-test cleanup"
+    git push
+    ```
+  - This must be handled by a CI job (e.g., GitHub Actions) or a post-test script invoked by the AI assistant.
+
+- **Safety guards**
+  - The automation MUST abort if `git status --porcelain` outputs anything after the add step (indicating new junk created during commit).
+  - Commits created by this rule must use the `ci:` prefix and contain *only* cleanup-related changes.
+
+- **Why**
+  - Guarantees the repository stays green and clean after each automated contribution.
+  - Eliminates human error where transient artifacts remain or tests are forgotten before push.
+
+- **Local enforcement (optional)**
+  - Developers may enable a local `pre-push` hook that runs tests and the cleanup script, mimicking CI behaviour.
