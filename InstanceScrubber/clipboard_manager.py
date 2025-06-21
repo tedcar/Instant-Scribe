@@ -27,6 +27,8 @@ import logging
 import time
 import re
 import textwrap
+import zlib
+from typing import Optional
 
 __all__ = ["copy_with_verification"]
 
@@ -108,6 +110,15 @@ def copy_with_verification(
     # preserve the existing copy-then-paste approach to keep semantics simple.
 
     # ------------------------------------------------------------------
+    # Pre-compute CRC32 checksum for integrity verification (Task 36)
+    # ------------------------------------------------------------------
+    try:
+        checksum_original: Optional[int] = zlib.crc32(payload.encode("utf-8")) & 0xFFFFFFFF
+    except Exception as exc:  # pragma: no cover – extremely unlikely
+        _LOG.warning("Failed to compute CRC32 – falling back to string comparison: %s", exc)
+        checksum_original = None
+
+    # ------------------------------------------------------------------
     # Attempt clipboard copy with verification loop
     # ------------------------------------------------------------------
     for attempt in range(1, max_retries + 1):
@@ -123,9 +134,22 @@ def copy_with_verification(
             # time to propagate the data.
             try:
                 time.sleep(retry_delay)
-                if pyperclip.paste() == payload:
-                    _LOG.debug("Clipboard verification succeeded on attempt %d", attempt)
-                    return True
+
+                clipboard_contents = pyperclip.paste()
+
+                # ------------------------------------------------------------------
+                # Integrity verification using CRC32 (preferred) or full text fallback
+                # ------------------------------------------------------------------
+                if checksum_original is not None:
+                    checksum_clipboard = zlib.crc32(clipboard_contents.encode("utf-8")) & 0xFFFFFFFF
+                    if checksum_clipboard == checksum_original:
+                        _LOG.debug("Clipboard CRC32 verification succeeded on attempt %d", attempt)
+                        return True
+                else:  # Fallback path: compare full strings (should be rare)
+                    if clipboard_contents == payload:
+                        _LOG.debug("Clipboard full-text verification succeeded on attempt %d", attempt)
+                        return True
+
                 _LOG.debug("Clipboard verification mismatch on attempt %d", attempt)
             except pyperclip.PyperclipException as exc:
                 _LOG.debug("Clipboard paste failed on attempt %d/%d: %s", attempt, max_retries, exc)

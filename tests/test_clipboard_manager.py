@@ -118,4 +118,19 @@ def test_large_payload_no_crash(monkeypatch):
     large_payload = _LazyHugeStr()
 
     # Should execute without raising MemoryError or similar.
-    copy_with_verification(large_payload, max_retries=1) 
+    copy_with_verification(large_payload, max_retries=1)
+
+
+def test_crc_mismatch_triggers_fallback(tmp_output_dir, monkeypatch):
+    """If CRC32 does not match, fallback file should be created (Task 36)."""
+
+    # Copy succeeds but paste returns modified data causing checksum mismatch.
+    monkeypatch.setattr(sys.modules["pyperclip"], "paste", lambda: "tampered text")
+
+    result = copy_with_verification("original text", max_retries=1, retry_delay=0, fallback_dir=tmp_output_dir)
+    # Expect False since fallback path executed.
+    assert result is False
+
+    files = list(tmp_output_dir.iterdir())
+    assert files and files[0].suffix == ".txt"
+    assert files[0].read_text(encoding="utf-8").startswith("original text") 
