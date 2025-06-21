@@ -31,6 +31,10 @@ class ConfigManager:
         # Task 33 – GPU resource management
         "vram_unload_threshold_mb": 1024,  # Auto-unload when free VRAM < 1 GB
         "gpu_monitor_interval_sec": 5,     # Polling interval in seconds
+        # Task 35 – archive backup configuration
+        "backup_enabled": True,
+        "backup_interval_hours": 24,
+        "backup_destination": r"C:\\Users\\%USERNAME%\\Documents\\[01] Documents\\[15] AI Recordings\\backup",
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

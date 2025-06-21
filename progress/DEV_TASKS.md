@@ -216,9 +216,9 @@
 - [ ] 34.3 Introduce `pytest-benchmark` for performance regressions (ties to Task 29).
 
 ## 35  Archive Backup & Restore Utilities
-- [ ] 35.1 Implement scheduled ZIP backup of session archive to user-defined location.
-- [ ] 35.2 Provide `archive_restore.py` CLI restoring backups into the canonical folder structure.
-- [ ] 35.3 Integration test: backup-then-restore cycle preserves file hashes.
+- [x] 35.1 Implement scheduled ZIP backup of session archive to user-defined location. (commit: task35-backup)
+- [x] 35.2 Provide `archive_restore.py` CLI restoring backups into the canonical folder structure. (commit: task35-backup)
+- [x] 35.3 Integration test: backup-then-restore cycle preserves file hashes. (commit: task35-backup)
 
 ## 36  Clipboard Integrity Enhancements
 - [ ] 36.1 Add CRC32 checksum to clipboard payload; verify after paste.
