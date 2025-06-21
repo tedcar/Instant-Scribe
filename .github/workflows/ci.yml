@@ -71,6 +71,26 @@ jobs:
         with:
           name: instant-scribe-win-exe
           path: dist/Instant Scribe/Instant Scribe.exe
+      - name: Sign executable with signtool (Task 30)
+        if: env.CERTIFICATE_PFX_BASE64 != ''
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $certBase64 = $env:CERTIFICATE_PFX_BASE64
+          if (-not $certBase64) {
+            Write-Host 'No certificate provided; skipping signing.'
+            exit 0
+          }
+          $certPath = 'codesign.pfx'
+          [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($certBase64))
+          $exePath = 'dist/Instant Scribe/Instant Scribe.exe'
+          $timestampUrl = 'http://timestamp.digicert.com'
+          signtool sign /f $certPath /p $env:PFX_PASSWORD /tr $timestampUrl /td sha256 /fd sha256 "$exePath"
+
+      - name: Verify executable signature (Task 30)
+        shell: pwsh
+        run: |
+          scripts/verify_signature.ps1 'dist/Instant Scribe/Instant Scribe.exe'
 
   release:
     name: Create GitHub Release & Attach Installer

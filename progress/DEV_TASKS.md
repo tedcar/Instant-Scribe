@@ -191,9 +191,9 @@
 - [x] 29.3 Generate GitHub Actions artifact containing GPU-utilisation timeline and VRAM graph. (commit: task29-benchmark)
 
 ## 30  Security & Code Signing
-- [ ] 30.1 Acquire Authenticode certificate; store encrypted PFX in repository secrets.
-- [ ] 30.2 Automate `signtool` signing of `Instant Scribe.exe` within the release workflow.
-- [ ] 30.3 Add PowerShell script `verify_signature.ps1`; CI job fails if signature missing or invalid.
+- [x] 30.1 Acquire Authenticode certificate; store encrypted PFX in repository secrets. (commit: task30-code-signing)
+- [x] 30.2 Automate `signtool` signing of `Instant Scribe.exe` within the release workflow. (commit: task30-code-signing)
+- [x] 30.3 Add PowerShell script `verify_signature.ps1`; CI job fails if signature missing or invalid. (commit: task30-code-signing)
 
 ## 31  Privacy Audit & Network Guard
 - [ ] 31.1 Static-scan codebase for network calls (`socket`, `requests`, `http.client`).
