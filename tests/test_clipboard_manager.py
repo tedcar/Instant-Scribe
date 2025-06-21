@@ -5,8 +5,13 @@ import types
 
 import pytest
 
-# Ensure repo root on sys.path for import resolution
-ROOT_DIR = Path(inspect.getfile(inspect.currentframe())).resolve().parents[1]
+# Safely obtain the current frame for static analysers – *currentframe()* can
+# return *None* so we assert non-null before use.  The assert is runtime-cheap
+# and satisfies **mypy/ruff** Optional-to-str narrowing (Task 36 linter fix).
+_frame = inspect.currentframe()
+assert _frame is not None, "inspect.currentframe() returned None unexpectedly"
+
+ROOT_DIR = Path(inspect.getfile(_frame)).resolve().parents[1]  # type: ignore[arg-type]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
