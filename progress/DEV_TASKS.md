@@ -211,14 +211,14 @@
 - [x] 33.3 Notify user via toast and tray icon badge when automatic unload occurs. (commit: task33-gpu-monitor)
 
 ## 34  Advanced Testing Infrastructure
-- [ ] 34.1 Reach 90 % line coverage using `pytest-cov` (up from 80 %).
-- [ ] 34.2 Add property-based tests with `hypothesis` for VAD gate edge cases.
-- [ ] 34.3 Introduce `pytest-benchmark` for performance regressions (ties to Task 29).
+- [x] 34.1 Reach 90 % line coverage using `pytest-cov` (up from 80 %). (commit: task34-advanced-testing)
+- [x] 34.2 Add property-based tests with `hypothesis` for VAD gate edge cases. (commit: task34-advanced-testing)
+- [x] 34.3 Introduce `pytest-benchmark` for performance regressions (ties to Task 29). (commit: task34-advanced-testing)
 
 ## 35  Archive Backup & Restore Utilities
-- [ ] 35.1 Implement scheduled ZIP backup of session archive to user-defined location.
-- [ ] 35.2 Provide `archive_restore.py` CLI restoring backups into the canonical folder structure.
-- [ ] 35.3 Integration test: backup-then-restore cycle preserves file hashes.
+- [x] 35.1 Implement scheduled ZIP backup of session archive to user-defined location. (commit: task35-archive-backup-restore)
+- [x] 35.2 Provide `archive_restore.py` CLI restoring backups into the canonical folder structure. (commit: task35-archive-backup-restore)
+- [x] 35.3 Integration test: backup-then-restore cycle preserves file hashes. (commit: task35-archive-backup-restore)
 
 ## 36  Clipboard Integrity Enhancements
 - [ ] 36.1 Add CRC32 checksum to clipboard payload; verify after paste.

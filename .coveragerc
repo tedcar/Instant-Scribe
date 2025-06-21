@@ -3,4 +3,5 @@ omit =
     */transcription_worker.py
     */notification_manager.py
     */hotkey_manager.py
-    */config_manager.py 
+    */config_manager.py
+    */archive_backup.py 
