@@ -23,7 +23,10 @@ from InstanceScrubber.audio_listener import (  # type: ignore
     AudioStreamer,  # noqa: F401 – re-export
     VADAudioGate,   # noqa: F401 – re-export
 )
-from InstanceScrubber.silence_pruner import SilencePruner  # type: ignore  # noqa: F401
+from InstanceScrubber.silence_pruner import (  # type: ignore  # noqa: F401
+    prune_long_silences,
+    prune_pcm_bytes,
+)
 from InstanceScrubber.audio_enhancement import (  # type: ignore  # noqa: F401
     apply_agc_pcm,
     apply_noise_suppression_pcm,
@@ -33,7 +36,8 @@ from InstanceScrubber.batch_transcriber import BatchTranscriber  # type: ignore 
 __all__: list[str] = [
     "AudioStreamer",
     "VADAudioGate",
-    "SilencePruner",
+    "prune_long_silences",
+    "prune_pcm_bytes",
     "apply_agc_pcm",
     "apply_noise_suppression_pcm",
     "BatchTranscriber",

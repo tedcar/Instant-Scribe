@@ -101,7 +101,35 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         HotkeyManagerCls = importlib.import_module("InstanceScrubber.hotkey_manager").HotkeyManager
         NotificationManagerCls = importlib.import_module("InstanceScrubber.notification_manager").NotificationManager
         TranscriptionWorkerCls = importlib.import_module("InstanceScrubber.transcription_worker").TranscriptionWorker
-        TrayAppCls = importlib.import_module("InstanceScrubber.tray_app").TrayApp
+
+        # When running in *stub* mode (CI / load-tests) we replace the real UI
+        # classes with *no-op* dummies to eliminate native-GUI crashes that can
+        # surface in headless environments (see Task 40 failure regression).
+        if use_stub_worker:
+            class _DummyHotkey:  # pylint: disable=too-few-public-methods
+                def __init__(self, *_a, **_kw):
+                    pass
+
+                def start(self):  # noqa: D401 – dummy API
+                    return True
+
+                def stop(self):  # noqa: D401 – dummy API
+                    return None
+
+            class _DummyTray:  # pylint: disable=too-few-public-methods
+                def __init__(self, *_a, **_kw):
+                    pass
+
+                def start(self):  # noqa: D401 – dummy API
+                    return False
+
+                def stop(self):  # noqa: D401 – dummy API
+                    return None
+
+            HotkeyManagerCls = _DummyHotkey  # type: ignore[assignment]
+            TrayAppCls = _DummyTray  # type: ignore[assignment]
+        else:
+            TrayAppCls = importlib.import_module("InstanceScrubber.tray_app").TrayApp
 
         def _safe_init(cls, *args, **kwargs):  # noqa: D401 – local util
             try:
