@@ -1,0 +1,4 @@
+# file: C:\Users\Admin\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\audio_enhancement.py
+# hypothesis_version: 6.135.14
+
+[-20.0, 0.0, 1.0, 8.0, 20.0, 500, 16000, 32767, 'apply_agc_pcm']

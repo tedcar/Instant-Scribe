@@ -1,0 +1,4 @@
+# file: C:\Users\Admin\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\transcription_worker.py
+# hypothesis_version: 6.135.14
+
+[120, 8000, 16000, 'CUDA out of memory', 'EngineResponse', 'TranscriptionEngine', 'TranscriptionError', 'TranscriptionWorker', 'context manager exit', 'cuda_oom', 'error', 'hello world', 'inf', 'loaded', 'nemo.collections.asr', 'normal shutdown', 'spawn', 'state', 'text', 'timestamp', 'unloaded', 'use_stub', 'word']

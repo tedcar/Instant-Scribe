@@ -1,0 +1,4 @@
+# file: C:\Users\Admin\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\archive_manager.py
+# hypothesis_version: 6.135.14
+
+['%Y-%m-%d_%H-%M-%S', 'ArchiveManager', 'Instant Scribe', '[^\\w\\-]', '_', 'archive', 'archive_root', 'empty', 'recording.wav', 'surrogatepass', 'utf-8']

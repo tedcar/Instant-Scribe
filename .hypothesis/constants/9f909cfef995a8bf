@@ -1,0 +1,4 @@
+# file: C:\Users\Admin\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\config_manager.py
+# hypothesis_version: 6.135.14
+
+[1024, 10000, 120000, 600000, '.config', 'APPDATA', 'Instant Scribe', 'XDG_CONFIG_HOME', '_', 'archive_root', 'batch_length_ms', 'batch_overlap_ms', 'config.json', 'ctrl+alt+f', 'enable_agc', 'hotkey', 'nt', 'r', 'show_notifications', 'silence_threshold_ms', 'utf-8', 'vad_aggressiveness', 'w']

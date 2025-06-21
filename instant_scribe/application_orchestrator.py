@@ -353,6 +353,17 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             self.spooler.write_chunk(audio_bytes)
         except Exception as exc:  # pylint: disable=broad-except
             self._log.debug("Spooler write failed: %s", exc)
+        # Task 37 – optional audio quality enhancements (AGC & noise suppression)
+        try:
+            if bool(self.config.get("enable_agc", False)):
+                from InstanceScrubber.audio_enhancement import apply_agc_pcm  # local import for performance
+                audio_bytes = apply_agc_pcm(audio_bytes, sample_rate=16_000)
+            if bool(self.config.get("enable_noise_suppression", False)):
+                from InstanceScrubber.audio_enhancement import apply_noise_suppression_pcm
+                audio_bytes = apply_noise_suppression_pcm(audio_bytes, sample_rate=16_000)
+        except Exception as exc:  # pylint: disable=broad-except
+            # Enhancements are *optional* – log and continue with original audio on failure.
+            self._log.debug("Audio enhancement failed – continuing without: %s", exc)
         # Task 22 – prune *long* silence segments (>2 min) before GPU inference
         try:
             threshold_ms = int(self.config.get("silence_prune_threshold_ms", 120_000))

@@ -1,0 +1,4 @@
+# file: C:\Users\Admin\Documents\[01] Documents\[12] Apps\Instant Scribe\instant_scribe\crash_reporter.py
+# hypothesis_version: 6.135.14
+
+[1024, '%Y%m%d_%H%M%S', '%Y-%m-%d %H:%M:%S', '.instant_scribe', '10', 'APPDATA', 'Instant Scribe', 'Uncaught exception', 'a', 'close', 'crash.log', 'generate_report_zip', 'install', 'logs/crash.log', 'nt', 'reports', 'utf-8', 'w']

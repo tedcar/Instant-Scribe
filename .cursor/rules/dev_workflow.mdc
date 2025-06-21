@@ -1,0 +1,33 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+- **Follow this exact 5-step workflow for EVERY new development task**
+  1. **Implement the task completely** – finish all code changes before proceeding.
+  2. **Create or update automated tests** that cover the new behaviour at the feature level.
+  3. **Run the full test-suite locally** (e.g. `pytest`) and ensure **100 % pass rate**.
+  4. **Clean up any temporary / trash files** (e.g. `Hello*.txt`, `aaaa*.txt`, large debug artefacts). If many such files exist, run the helper script `scripts/cleanup_trash.py` (*placeholder* – create or update as needed) instead of deleting manually.
+  5. **Only after steps 1-4 succeed, perform a Git commit & push**. Never push partial or failing work.
+
+- **Trash file policy**
+  - Treat any file matching patterns like `Hello*.txt`, `aaaa*.txt`, `tmp_*`, `debug_*` as trash unless explicitly required.
+  - These files **must not** be committed. Ensure `.gitignore` rules or scripted cleanup prevents them from reaching the repository.
+
+- **Why this rule exists**
+  - Keeps commit history clean and atomic.
+  - Guarantees CI stability because every push includes code + tests that already pass locally.
+  - Prevents accumulation of stray artefacts that pollute the workspace and bloat the repository.
+
+- **Examples**
+  ```bash
+  # ✅ DO
+  # Finish feature, add tests, run pytest, clean artefacts, then push
+  git add .
+  git commit -m "feat: implement Task 42 – telemetry opt-out"
+  git push origin feature/task-42
+
+  # ❌ DON'T
+  # Push code before tests pass or without cleaning generated files
+  git push origin incomplete-work
+  ```

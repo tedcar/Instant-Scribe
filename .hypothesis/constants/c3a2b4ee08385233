@@ -1,0 +1,4 @@
+# file: C:\Users\Admin\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\audio_listener.py
+# hypothesis_version: 6.135.14
+
+[700, 1000, 16000, 'AudioStreamer', 'VAD → speech_start', 'VADAudioGate', 'Vad', '_webrtcvad', 'silence_threshold_ms', 'vad_aggressiveness']

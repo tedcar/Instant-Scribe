@@ -1,0 +1,4 @@
+# file: C:\Users\Admin\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\silence_pruner.py
+# hypothesis_version: 6.135.14
+
+[100, 1000, 16000, 120000, 'prune_long_silences', 'prune_pcm_bytes']
