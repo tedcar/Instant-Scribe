@@ -196,9 +196,9 @@
 - [x] 30.3 Add PowerShell script `verify_signature.ps1`; CI job fails if signature missing or invalid. (commit: task30-code-signing)
 
 ## 31  Privacy Audit & Network Guard
-- [ ] 31.1 Static-scan codebase for network calls (`socket`, `requests`, `http.client`).
-- [ ] 31.2 Unit-test asserting that no outbound connections occur during a full recording/transcription cycle.
-- [ ] 31.3 Document privacy guarantee in `docs/PRIVACY.md`; include audit script results.
+- [x] 31.1 Static-scan codebase for network calls (`socket`, `requests`, `http.client`). (commit: task31-privacy-guard)
+- [x] 31.2 Unit-test asserting that no outbound connections occur during a full recording/transcription cycle. (commit: task31-privacy-guard)
+- [x] 31.3 Document privacy guarantee in `docs/PRIVACY.md`; include audit script results. (commit: task31-privacy-guard)
 
 ## 32  Crash Reporting & Exception Analytics
 - [x] 32.1 Implement `crash_reporter.py` capturing uncaught exceptions to rotating `crash.log` (10 × 1 MB). (commit: crash-reporting-impl)
