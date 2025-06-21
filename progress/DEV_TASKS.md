@@ -186,9 +186,9 @@
 - [x] 28.4 CI job fails on style or typing errors; annotate offending lines in PR review. (commit: task28-code-style)
 
 ## 29  Continuous Performance Benchmarking
-- [ ] 29.1 Implement `benchmarks/rtf_benchmark.py` measuring Real-Time-Factor (RTF) for 30-s sample audio.
-- [ ] 29.2 Store baseline metrics in `benchmark_baselines.json`; flag CI failure if regression > 10 %.
-- [ ] 29.3 Generate GitHub Actions artifact containing GPU-utilisation timeline and VRAM graph.
+- [x] 29.1 Implement `benchmarks/rtf_benchmark.py` measuring Real-Time-Factor (RTF) for 30-s sample audio. (commit: task29-benchmark)
+- [x] 29.2 Store baseline metrics in `benchmark_baselines.json`; flag CI failure if regression > 10 %. (commit: task29-benchmark)
+- [x] 29.3 Generate GitHub Actions artifact containing GPU-utilisation timeline and VRAM graph. (commit: task29-benchmark)
 
 ## 30  Security & Code Signing
 - [ ] 30.1 Acquire Authenticode certificate; store encrypted PFX in repository secrets.

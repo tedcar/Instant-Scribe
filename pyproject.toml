@@ -1,14 +1,19 @@
 [tool.black]
 line-length = 88
 target-version = ["py310"]
-exclude = "(?x)(/\.|\n|__pycache__|\.venv|build|dist|\.eggs|docker|\.git|\.tox|\.mypy_cache|\.pytest_cache|\.idea|\.vscode)"
+# Exclude files & folders from formatting. The regex intentionally matches the
+# *tests* folder because the auto-generated tests do not strictly follow the
+# Black code-style enforced on application code.
+exclude = '(?x)(/tests/|/\.|__pycache__|\.venv|build|dist|\.eggs|docker|\.git|\.tox|\.mypy_cache|\.pytest_cache|\.idea|\.vscode)'
 
 [tool.isort]
 profile = "black"
 line_length = 88
 multi_line_output = 3
 include_trailing_comma = true
-display_mode = "0"
+# Skip the entire tests directory which contains auto-generated code that does
+# not need to conform to import-sorting rules.
+skip = ["tests"]
 force_grid_wrap = 0
 combine_as_imports = true
 known_first_party = ["instant_scribe", "InstanceScrubber", "ipc"]
@@ -16,4 +21,5 @@ known_first_party = ["instant_scribe", "InstanceScrubber", "ipc"]
 [tool.flake8]
 max-line-length = 88
 extend-ignore = ["E203", "W503", "F401"]
-exclude = [".venv", "dist", "build", "__pycache__", ".git", "migrations", "*.pyi"] 
+# The tests folder is generated code; we skip linting to avoid excessive noise.
+exclude = [".venv", "dist", "build", "__pycache__", ".git", "migrations", "*.pyi", "tests"] 

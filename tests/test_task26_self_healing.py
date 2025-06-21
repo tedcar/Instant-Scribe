@@ -17,7 +17,7 @@ _system_check_spec = _ilu.spec_from_file_location(
     "system_check", ROOT_DIR / "scripts" / "system_check.py"
 )
 sc = _ilu.module_from_spec(_system_check_spec)  # type: ignore
-# mypy: ignore-errors – dynamic loader
+# dynamic loader (mypy ignored via global configuration)
 assert _system_check_spec.loader is not None
 _system_check_spec.loader.exec_module(sc)  # type: ignore  # pragma: no cover
 
