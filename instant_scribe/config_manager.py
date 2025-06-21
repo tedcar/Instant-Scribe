@@ -30,6 +30,9 @@ class ConfigManager:
         # Task 25 – Pause / Resume workflow defaults
         "pause_hotkey": "ctrl+alt+c",
         "paused": False,
+        # Task 37 – Audio quality optimisations
+        "enable_agc": False,
+        "enable_noise_suppression": False,
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

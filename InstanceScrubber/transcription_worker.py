@@ -27,6 +27,8 @@ from dataclasses import dataclass
 from typing import Any, List, Sequence, Tuple
 
 import numpy as np
+from InstanceScrubber.audio_processing import preprocess_audio  # <-- NEW IMPORT
+from InstanceScrubber.config_manager import ConfigManager as _CM  # <-- NEW IMPORT
 
 # ---------------------------------------------------------------------------
 # Internal helpers – optional NeMo import with graceful fallback
@@ -226,6 +228,16 @@ from ipc.queue_wrapper import IPCQueue  # noqa: E402
 def _worker_process(request_q: _mp.Queue, response_q: _mp.Queue, *, use_stub: bool = False):
     """Entry-point executed in the background *spawned* process."""
 
+    # ------------------------------------------------------------------
+    # Load configuration once on process start so that toggles can be
+    # adjusted by the main application at runtime through a simple config
+    # file reload without code changes.
+    # ------------------------------------------------------------------
+
+    _cfg = _CM()
+    _enable_agc = bool(_cfg.get("enable_agc", False))
+    _enable_ns = bool(_cfg.get("enable_noise_suppression", False))
+
     engine = TranscriptionEngine()
     try:
         engine.load_model(use_stub=use_stub)
@@ -241,8 +253,17 @@ def _worker_process(request_q: _mp.Queue, response_q: _mp.Queue, *, use_stub: bo
             break
         if isinstance(msg, Transcribe):
             try:
+                # ------------------------------------------------------
+                # Optional AGC & noise-suppression (Task 37)
+                # ------------------------------------------------------
+                processed = preprocess_audio(
+                    msg.audio,
+                    enable_agc=_enable_agc,
+                    enable_noise_suppression=_enable_ns,
+                )
+
                 # Convert raw 16-bit PCM bytes → NumPy array for the engine
-                audio_np = np.frombuffer(msg.audio, dtype=np.int16)
+                audio_np = np.frombuffer(processed, dtype=np.int16)
                 text = engine.get_plain_transcription(audio_np)
                 response_q.put(Response(result=EngineResponse(ok=True, payload=text)))
             except Exception as exc:  # pylint: disable=broad-except – robustness
@@ -351,7 +372,17 @@ class TranscriptionWorker:
         if self._use_stub:
             assert self._inline_engine is not None  # for type checker
             try:
-                audio_np = np.frombuffer(audio_pcm, dtype=np.int16)
+                # Apply same preprocessing logic as the background worker so
+                # that unit-tests exercise the full Task-37 pipeline even in
+                # fast *inline* mode.
+                cfg = _CM()
+                processed_pcm = preprocess_audio(
+                    audio_pcm,
+                    enable_agc=bool(cfg.get("enable_agc", False)),
+                    enable_noise_suppression=bool(cfg.get("enable_noise_suppression", False)),
+                )
+
+                audio_np = np.frombuffer(processed_pcm, dtype=np.int16)
                 text = self._inline_engine.get_plain_transcription(audio_np)
                 return EngineResponse(ok=True, payload=text)
             except Exception as exc:  # pragma: no cover – stub path safety

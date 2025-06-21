@@ -226,9 +226,9 @@
 - [ ] 36.3 Document rare clipboard failure scenarios and mitigation steps.
 
 ## 37  Audio Quality Optimisations
-- [ ] 37.1 Implement optional automatic gain control (AGC) using `pydub`.
-- [ ] 37.2 Add noise suppression toggle leveraging RNNoise; expose in config.
-- [ ] 37.3 Comparative benchmark: WER before/after AGC + noise suppression.
+- [x] 37.1 Implement optional automatic gain control (AGC) using `pydub`. (commit: task37-audio-quality)
+- [x] 37.2 Add noise suppression toggle leveraging RNNoise; expose in config. (commit: task37-audio-quality)
+- [x] 37.3 Comparative benchmark: WER before/after AGC + noise suppression. (commit: task37-audio-quality)
 
 ## 38  Continuous Integration & Release Automation
 - [ ] 38.1 Consolidate lint, test, benchmark, build, sign, and upload steps into a single reusable GitHub Actions workflow.
