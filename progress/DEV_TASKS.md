@@ -241,14 +241,14 @@
 - [NO] 39.3 Provide CLI flag `--force-model-update` to bypass prompt.
 
 ## 40  End-to-End System Load Testing
-- [ ] 40.1 Simulate 8-hour continuous recording; monitor CPU/GPU/RAM for leaks.
-- [ ] 40.2 Fail test if cumulative VRAM usage drifts > 5 % post-GC.
-- [ ] 40.3 Generate HTML report with Grafana-style graphs.
+- [x] 40.1 Simulate 8-hour continuous recording; monitor CPU/GPU/RAM for leaks. (commit: task40-system-load-test)
+- [x] 40.2 Fail test if cumulative VRAM usage drifts > 5 % post-GC. (commit: task40-system-load-test)
+- [x] 40.3 Generate HTML report with Grafana-style graphs. (commit: task40-system-load-test)
 
 ## 41  Codebase Modularisation & Documentation
-- [ ] 41.1 Refactor monolithic modules into domain-focused packages (`audio`, `ipc`, `ui`, `core`).
-- [ ] 41.2 Auto-generate API docs with `pdoc`; publish to GitHub Pages.
-- [ ] 41.3 Add architectural decision records (ADRs) following the MADR template.
+- [x] 41.1 Refactor monolithic modules into domain-focused packages (`audio`, `ipc`, `ui`, `core`). (commit: task41-modularisation)
+- [x] 41.2 Auto-generate API docs with `pdoc`; publish to GitHub Pages. (commit: task41-modularisation)
+- [x] 41.3 Add architectural decision records (ADRs) following the MADR template. (commit: task41-modularisation)
 
 ## 42  Legal & Compliance Review
 - [ ] 42.1 Conduct license audit for all dependencies; record SPDX identifiers.

@@ -39,3 +39,6 @@ pynvml==11.5.0
 
 pytest-benchmark>=4.0.0
 hypothesis>=6.100.0
+
+# Documentation generator (Task 41)
+pdoc3>=0.10.0
