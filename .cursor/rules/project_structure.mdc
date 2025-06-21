@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Group code by domain and responsibility**
   - `audio/`, `ipc/`, `ui/`, `core/` sub-packages must contain related modules only – avoid dumping scripts at repository root.

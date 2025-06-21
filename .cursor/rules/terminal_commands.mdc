@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Never spawn an interactive shell in CI or via AI automation**
   - ALWAYS append non-interactive flags (e.g. `--yes`, `--quiet`, `| cat`) when running tools that may wait for user input.

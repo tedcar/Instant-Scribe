@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **What is `InstanceScrubber`?**
   - The single top-level Python package that contains *all* production code for the Instant Scribe application.

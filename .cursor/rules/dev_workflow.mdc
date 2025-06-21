@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Follow this exact 5-step workflow for EVERY new development task**
   1. **Implement the task completely** – finish all code changes before proceeding.

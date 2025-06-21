@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Never rebuild, delete or modify the `.venv` directory**
   - The current virtual-environment is considered the **source of truth** for library versions.

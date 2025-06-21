@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Automate housekeeping when tests succeed**
   - After `pytest` completes with **0 failures** *and* the workspace contains **no untracked dirty files** (except expected build artefacts listed in `.gitignore`), run:

@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Write tests at the task level, not the sub-task level**
   - A *whole task* corresponds to an H2 section in `Progress/DEV_TASKS.md` (e.g. "Logging & Configuration Framework").

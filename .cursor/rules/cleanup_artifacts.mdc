@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Purge temporary text artifacts before committing**
   - Files matching `*_world*.txt`, `retry_text*.txt`, `aaaaaaaaaa*.txt`, `Hello*.txt`, and other short test/fallback payloads **MUST NOT** be present in Git history.

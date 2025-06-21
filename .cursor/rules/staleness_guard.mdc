@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 - **Never let old tasks rot**
   - The `scripts/staleness_guard.py` tool inspects every `- [ ]` entry in `progress/DEV_TASKS.md`.

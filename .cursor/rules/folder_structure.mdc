@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 - **Production code must reside in `InstanceScrubber/` or `instant_scribe/`**
   - Any `.py` file outside these packages (excluding `tests/`, `scripts/`, or tooling) is a rule violation.

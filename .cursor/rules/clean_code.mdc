@@ -1,7 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 - **Keep the repository free of orphaned or dead code**
   - Delete experimental scripts once migrated into production modules or move them under `archive/` (and .gitignore).
