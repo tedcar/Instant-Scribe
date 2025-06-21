@@ -141,10 +141,10 @@
 - [x] 20.3 Generate architecture diagram (`docs/diagram.mmd`) using Mermaid. (commit: docs-task20)
 
 ## 21  Background Batch Transcription
-- [ ] 21.1 Implement `batch_transcriber.py` consuming 10-minute audio slices in parallel during recording.
-- [ ] 21.2 Merge partial transcriptions on recording stop and maintain correct order.
-- [ ] 21.3 Expose batch length & overlap to `ConfigManager`.
-- [ ] 21.4 Integration test: 30-min dummy recording returns text in < 3 s.
+- [x] 21.1 Implement `batch_transcriber.py` consuming 10-minute audio slices in parallel during recording. (commit: task21-batch-transcriber)
+- [x] 21.2 Merge partial transcriptions on recording stop and maintain correct order. (commit: task21-batch-transcriber)
+- [x] 21.3 Expose batch length & overlap to `ConfigManager`. (commit: task21-batch-transcriber)
+- [x] 21.4 Integration test: 30-min dummy recording returns text in < 3 s. (commit: task21-batch-transcriber)
 
 ## 22  Silence Removal Pre-Processor
 - [ ] 22.1 Add `silence_pruner.py` that trims > 2 min silence segments prior to transcription.
@@ -235,10 +235,10 @@
 - [ ] 38.2 Publish signed installer to GitHub Releases; auto-increment semantic version.
 - [ ] 38.3 Slack/Teams webhook notification on successful release (configurable, defaults to disabled).
 
-## 39  Parakeet Model Update Checker
-- [ ] 39.1 Weekly background job checks Hugging Face for newer Parakeet TDT checkpoints.
-- [ ] 39.2 Prompt user via toast to download & benchmark candidate model.
-- [ ] 39.3 Provide CLI flag `--force-model-update` to bypass prompt.
+## 39  Parakeet Model Update Checker (delted task, you should never update the model!, updates can cause instabilities, this a local once and for all setup, the model is already as fast as possible, no need for a better version!)
+- [NO] 39.1 Weekly background job checks Hugging Face for newer Parakeet TDT checkpoints.
+- [HELL NO!] 39.2 Prompt user via toast to download & benchmark candidate model.
+- [NO] 39.3 Provide CLI flag `--force-model-update` to bypass prompt.
 
 ## 40  End-to-End System Load Testing
 - [ ] 40.1 Simulate 8-hour continuous recording; monitor CPU/GPU/RAM for leaks.

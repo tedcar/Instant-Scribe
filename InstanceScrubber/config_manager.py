@@ -21,6 +21,7 @@ class ConfigManager:
         "vad_aggressiveness": 2,
         "silence_threshold_ms": 120000,  # 2 minutes default threshold per PRD §3.2.5
         "batch_length_ms": 600000,       # 10-minute batches (Task 21 requirement)
+        "batch_overlap_ms": 10000,       # 10-second overlap between batches (Task 21.3)
         "show_notifications": True,
         "copy_to_clipboard_on_click": True,
         "archive_root": r"C:\\Users\\%USERNAME%\\Documents\\[01] Documents\\[15] AI Recordings",
