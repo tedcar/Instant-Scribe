@@ -30,3 +30,11 @@ __pycache__/
 
 # Coverage output
 .coverage
+
+# Build artefacts
+build/
+dist/
+
+# Python caches
+.mypy_cache/
+.pytest_cache/
