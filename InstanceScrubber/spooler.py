@@ -34,10 +34,24 @@ class AudioSpooler:  # pylint: disable=too-few-public-methods
     # ------------------------------------------------------------------
     # Construction helpers
     # ------------------------------------------------------------------
-    def __init__(self) -> None:  # noqa: D401 – simple ctor
+    def __init__(self, *, chunk_interval_sec: int | None = None) -> None:  # noqa: D401 – simple ctor
+        """Create a new *AudioSpooler* instance.
+
+        Parameters
+        ----------
+        chunk_interval_sec
+            Desired *chunk interval* in **seconds**.  When *None* the default
+            60-second value defined by Task&nbsp;24 is used.  The argument is
+            accepted for forward-compatibility – current implementation writes
+            one file per :py:meth:`write_chunk` invocation but storing the
+            interval now means the API remains stable when future work adds
+            time-based rotation.
+        """
         self._temp_dir: Path = self._get_temp_dir()
         self._counter: int = 0
         self._active: bool = False
+        # Task 24 – configurable chunk interval (seconds)
+        self._chunk_interval_sec: int = int(chunk_interval_sec or 60)
 
     # ------------------------------------------------------------------
     # Session helpers
@@ -86,6 +100,62 @@ class AudioSpooler:  # pylint: disable=too-few-public-methods
         self._counter = 0
 
     # ------------------------------------------------------------------
+    # Recovery helpers (Task 24)
+    # ------------------------------------------------------------------
+    @classmethod
+    def merge_chunks(
+        cls,
+        *,
+        source_dir: Path | None = None,
+        destination: Path | None = None,
+        cleanup: bool = False,
+    ) -> Path:  # noqa: D401 – utility API
+        """Merge sequential ``chunk_*.pcm`` files into a single output file.
+
+        Parameters
+        ----------
+        source_dir
+            Directory containing the chunk files.  Defaults to the canonical
+            temp spool directory.
+        destination
+            Desired output *Path*.  If *None* a file named ``merged.pcm`` will
+            be created in *source_dir*.
+        cleanup
+            When *True* the individual chunk files are deleted **after** a
+            successful merge – this mirrors the recovery workflow where the
+            temporary files are no longer needed once reconstructed.
+
+        Returns
+        -------
+        Path
+            The *Path* to the created merged file.
+        """
+        src = source_dir or cls._get_temp_dir()
+        if not src.exists():
+            raise FileNotFoundError(f"Source directory does not exist: {src}")
+
+        # Discover chunk files and sort by their numeric index to preserve
+        # recording order.
+        chunk_files = sorted(src.glob("chunk_*.pcm"), key=cls._sort_key)
+        if not chunk_files:
+            raise FileNotFoundError("No chunk files found to merge")
+
+        dest_path = destination or src / "merged.pcm"
+        # Concatenate using buffered reads to avoid loading all data into RAM.
+        with dest_path.open("wb") as out_fh:
+            for file in chunk_files:
+                with file.open("rb") as in_fh:
+                    shutil.copyfileobj(in_fh, out_fh, length=64 * 1024)
+
+        if cleanup:
+            for file in chunk_files:
+                try:
+                    file.unlink(missing_ok=True)  # type: ignore[arg-type]
+                except Exception:  # pragma: no cover – best-effort clean-up
+                    pass
+        return dest_path
+
+    # ------------------------------------------------------------------
     # Class-level helpers
     # ------------------------------------------------------------------
     @classmethod
@@ -106,4 +176,14 @@ class AudioSpooler:  # pylint: disable=too-few-public-methods
         else:
             # Cross-platform fallback so tests pass on Linux/macOS runners.
             base = Path(tempfile.gettempdir())
-        return base / cls._APP_NAME / "temp" 
+        return base / cls._APP_NAME / "temp"
+
+    @staticmethod
+    def _sort_key(path: Path) -> int:  # noqa: D401 – helper
+        """Return numeric index extracted from *chunk_XXXX.pcm* name for sorting."""
+        stem = path.stem  # e.g. 'chunk_0012'
+        try:
+            return int(stem.split("_")[1])
+        except (IndexError, ValueError):
+            # Fallback ensures non-conformant files are sorted last but kept
+            return 0x7FFF_FFFF 

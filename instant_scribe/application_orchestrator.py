@@ -122,8 +122,10 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             on_exit=self.shutdown,
         )
 
-        # Task 12 – persistent audio spooler
-        self.spooler = AudioSpooler()
+        # Task 12 & 24 – persistent audio spooler with configurable chunk interval
+        self.spooler = AudioSpooler(
+            chunk_interval_sec=int(self.config.get("spooler_chunk_interval_sec", 60))
+        )
 
         # On startup detect incomplete recording and notify user.
         try:

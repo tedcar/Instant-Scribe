@@ -152,15 +152,15 @@
 - [x] 22.3 Unit test ensuring trimmed output length ≤ input length ‑ 2 min silence. (commit: task22-silence-pruner)
 
 ## 23  Clipboard Robustness
-- [ ] 23.1 Create `clipboard_manager.py` with `copy_with_verification()` and retry logic.
-- [ ] 23.2 Fallback: write `.txt` file named after first 7 words if copy fails.
-- [ ] 23.3 Stress test: copy 1 billion-char string to ensure no crash.
-- [ ] 23.4 Integration test: simulate clipboard access denial.
+- [x] 23.1 Create `clipboard_manager.py` with `copy_with_verification()` and retry logic. (commit: task23-clipboard-manager)
+- [x] 23.2 Fallback: write `.txt` file named after first 7 words if copy fails. (commit: task23-clipboard-manager)
+- [x] 23.3 Stress test: copy 1 billion-char string to ensure no crash. (commit: task23-clipboard-manager)
+- [x] 23.4 Integration test: simulate clipboard access denial. (commit: task23-clipboard-manager)
 
 ## 24  Enhanced Recording Spooler
-- [ ] 24.1 Configure spooler chunk interval to 60 s default, value in config.
-- [ ] 24.2 Implement chunk merge utility for recovery workflow.
-- [ ] 24.3 Unit test merge of 120 sequential PCM chunks.
+- [x] 24.1 Configure spooler chunk interval to 60 s default, value in config. (commit: task24-spooler-enhancements)
+- [x] 24.2 Implement chunk merge utility for recovery workflow. (commit: task24-spooler-enhancements)
+- [x] 24.3 Unit test merge of 120 sequential PCM chunks. (commit: task24-spooler-enhancements)
 
 ## 25  Pause & Resume Workflow
 - [ ] 25.1 Bind `Ctrl+Alt+C` hotkey in `hotkey_manager.py` to toggle pause state.

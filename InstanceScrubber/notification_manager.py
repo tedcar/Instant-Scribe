@@ -221,6 +221,12 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
     def _copy_to_clipboard(payload: str) -> None:
         """Copy *payload* to the system clipboard – with error suppression."""
         try:
-            pyperclip.copy(payload)
-        except pyperclip.PyperclipException as exc:  # pragma: no cover
-            logging.getLogger(__name__).warning("Clipboard unavailable: %s", exc) 
+            # Delegate the heavy lifting to the centralised helper (Task 23)
+            from .clipboard_manager import copy_with_verification  # local import to avoid cycles
+
+            if not copy_with_verification(payload):
+                logging.getLogger(__name__).warning(
+                    "Clipboard unavailable – payload written to fallback file instead",
+                )
+        except Exception as exc:  # pragma: no cover – unexpected runtime error
+            logging.getLogger(__name__).warning("Clipboard handling failed: %s", exc) 

@@ -26,6 +26,8 @@ class ConfigManager:
         "copy_to_clipboard_on_click": True,
         "archive_root": r"C:\\Users\\%USERNAME%\\Documents\\[01] Documents\\[15] AI Recordings",
         "silence_prune_threshold_ms": 120000,  # Task 22 – long-silence pruning (> 2 min)
+        # Task 24 – enhanced spooler chunk interval (seconds)
+        "spooler_chunk_interval_sec": 60,
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:
