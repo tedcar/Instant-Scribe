@@ -174,10 +174,10 @@
 - [x] 26.3 Unit test: simulate missing driver to validate error path. (commit: self-heal-dependency-checker)
 
 ## 27  Dependency Management & Automated Pinning
-- [ ] 27.1 Audit all direct and transitive dependencies; record minimum compatible versions in `requirements.in`.
-- [ ] 27.2 Automate weekly `pip-compile` run; open PR when the lockfile diff exceeds two patches.
-- [ ] 27.3 Add CI gate that fails if `pip check` reports vulnerabilities or version mismatches.
-- [ ] 27.4 Document upgrade policy and review checklist in `docs/DEPENDENCIES.md`.
+- [x] 27.1 Audit all direct and transitive dependencies; record minimum compatible versions in `requirements.in`. (commit: task27-dependency-management)
+- [x] 27.2 Automate weekly `pip-compile` run; open PR when the lockfile diff exceeds two patches. (commit: task27-dependency-management)
+- [x] 27.3 Add CI gate that fails if `pip check` reports vulnerabilities or version mismatches. (commit: task27-dependency-management)
+- [x] 27.4 Document upgrade policy and review checklist in `docs/DEPENDENCIES.md`. (commit: task27-dependency-management)
 
 ## 28  Code Style, Linting & Static Analysis
 - [ ] 28.1 Adopt `black` + `isort` for formatting; enforce via pre-commit hook.
