@@ -27,6 +27,9 @@ class ConfigManager:
         "show_notifications": True,
         "copy_to_clipboard_on_click": True,
         "archive_root": r"C:\\Users\\%USERNAME%\\Documents\\[01] Documents\\[15] AI Recordings",
+        # Task 25 – Pause / Resume workflow defaults
+        "pause_hotkey": "ctrl+alt+c",
+        "paused": False,
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

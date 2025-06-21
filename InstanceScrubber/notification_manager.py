@@ -178,6 +178,45 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             self._log.warning("Failed to display toast: %s", exc)
 
     # ------------------------------------------------------------------
+    # Task 25 – Pause / Resume notifications
+    # ------------------------------------------------------------------
+
+    def show_pause_state(self, paused: bool) -> None:  # noqa: D401 – imperative API
+        """Display a toast notification indicating *pause* or *resume* state.
+
+        Parameters
+        ----------
+        paused
+            *True* to indicate the recording has been paused.
+            *False* to indicate recording has resumed.
+        """
+
+        title = "Instant Scribe"
+        message = "Recording paused." if paused else "Recording resumed."
+
+        if not self._toaster:
+            # Headless / unsupported environment – log and bail out.
+            self._log.debug("Toast suppressed (not supported). Body: %s", message)
+            return
+
+        # Reuse stub-friendly logic from other helpers to avoid duplication.
+        if Toast is None:
+            class _StubToast:  # pylint: disable=too-few-public-methods
+                def __init__(self):
+                    self.text_fields = []
+
+            toast = _StubToast()  # type: ignore[assignment]
+        else:
+            toast = Toast()  # type: ignore[call-arg]
+
+        toast.text_fields = [title, message]
+
+        try:
+            self._toaster.show_toast(toast)  # type: ignore[arg-type]
+        except Exception as exc:  # pragma: no cover – runtime path
+            self._log.warning("Failed to display toast: %s", exc)
+
+    # ------------------------------------------------------------------
     # Task 12 – crash recovery prompt
     # ------------------------------------------------------------------
 

@@ -113,6 +113,16 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             on_activate=self._toggle_model_vram,
         )
 
+        # Task 25 – Pause / Resume workflow -----------------------------
+        pause_cfg_adapter = _ConfigKeyAdapter(self.config, "pause_hotkey")
+        self.pause_hotkey_manager = HotkeyManager(
+            pause_cfg_adapter,
+            on_activate=self._toggle_pause,
+        )
+
+        # Track *pause* state persisted between sessions (Task 25.2)
+        self.is_paused: bool = bool(self.config.get("paused", False))
+
         # Track current model residency state – starts *loaded* because the
         # worker loads the model during *start()*.
         self._model_loaded: bool = True
@@ -180,18 +190,29 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         except Exception as exc:  # pylint: disable=broad-except
             self._log.debug("VRAM hotkey init error: %s", exc)
 
+        # Start the Pause / Resume hotkey (Task 25)
+        try:
+            if not self.pause_hotkey_manager.start():
+                self._log.warning("Pause hotkey unavailable – user must rely on tray UI")
+        except Exception as exc:  # pylint: disable=broad-except
+            self._log.debug("Pause hotkey init error: %s", exc)
+
         try:
             if not self.tray_app.start():
                 self._log.info("System-tray UI disabled (headless environment)")
         except Exception as exc:  # pylint: disable=broad-except
             self._log.debug("Tray UI initialisation error: %s", exc)
 
-        # Start microphone listener (may raise if PyAudio missing).
+        # Only auto-start microphone if not paused at launch.
         try:
-            self.audio_streamer.start()
-            # Task 12 – begin spooling chunks for this recording session
-            self.spooler.start_session()
-            self.is_listening = True
+            if not self.is_paused:
+                self.audio_streamer.start()
+                # Task 12 – begin spooling chunks for this recording session
+                self.spooler.start_session()
+                self.is_listening = True
+            else:
+                self.is_listening = True  # Considered *listening* but paused
+                self.notification_manager.show_pause_state(True)
         except Exception as exc:  # pylint: disable=broad-except
             self._log.warning("Audio streamer unavailable – running in *idle* mode: %s", exc)
             self.is_listening = False
@@ -220,6 +241,11 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
         try:
             self.vram_hotkey_manager.stop()
+        except Exception:
+            pass
+
+        try:
+            self.pause_hotkey_manager.stop()
         except Exception:
             pass
 
@@ -254,6 +280,9 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                     # Task 12 – clean up tmp chunks on normal stop
                     self.spooler.close_session(success=True)
                     self.is_listening = False
+                    # Reset pause state (Task 25)
+                    self.is_paused = False
+                    self.config.set("paused", False)
                     self._log.info("Listening stopped via user toggle")
                 except Exception as exc:  # pylint: disable=broad-except
                     self._log.warning("Unable to stop listener: %s", exc)
@@ -263,6 +292,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                     # Task 12 – begin spooling chunks for this recording session
                     self.spooler.start_session()
                     self.is_listening = True
+                    self.is_paused = False  # Ensure paused flag reset
+                    self.config.set("paused", False)
                     self._log.info("Listening started via user toggle")
                 except Exception as exc:  # pylint: disable=broad-except
                     self._log.error("Failed to start listener: %s", exc)
@@ -359,6 +390,37 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                         self._log.error("Load model failed: %s", resp.payload)
                 except Exception as exc:  # pylint: disable=broad-except
                     self._log.error("Error loading model: %s", exc)
+
+    # .................................................................
+    def _toggle_pause(self) -> None:  # noqa: D401 – imperative API
+        """Callback bound to *Ctrl+Alt+C* – pause/resume recording without ending session."""
+
+        with self._lock:
+            # Cannot pause if not currently in a *listening* session.
+            if not self.is_listening:
+                self._log.debug("Pause toggle ignored – not currently listening")
+                return
+
+            if self.is_paused:
+                # Resume recording
+                try:
+                    self.audio_streamer.start()
+                    self.is_paused = False
+                    self.config.set("paused", False)
+                    self.notification_manager.show_pause_state(False)
+                    self._log.info("Recording resumed via user toggle")
+                except Exception as exc:  # pylint: disable=broad-except
+                    self._log.error("Unable to resume recording: %s", exc)
+            else:
+                # Pause recording
+                try:
+                    self.audio_streamer.stop()
+                    self.is_paused = True
+                    self.config.set("paused", True)
+                    self.notification_manager.show_pause_state(True)
+                    self._log.info("Recording paused via user toggle")
+                except Exception as exc:  # pylint: disable=broad-except
+                    self._log.error("Unable to pause recording: %s", exc)
 
 
 # ---------------------------------------------------------------------------

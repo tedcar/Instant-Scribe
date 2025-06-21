@@ -36,7 +36,16 @@ import sys
 import textwrap
 from typing import Final
 import signal as _signal  # local alias to avoid polluting global namespace
+import logging
 
+# ---------------------------------------------------------------------------
+# Global logging – written to *system_check.log* for self-healing diagnostics
+# ---------------------------------------------------------------------------
+logging.basicConfig(
+    filename="system_check.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 GREEN: Final[str] = "\033[92m"
 RED: Final[str] = "\033[91m"
@@ -141,7 +150,12 @@ def _require_command(cmd: str, *version_args: str) -> None:
         are provided, ``--version`` is used by default.
     """
     if shutil.which(cmd) is None:
-        raise CheckError(f"{cmd} not found on PATH")
+        # Try a one-shot self-heal install before giving up.
+        logging.warning("%s not found on PATH – attempting self-heal install.", cmd)
+        _attempt_install_dependency(cmd)
+
+        if shutil.which(cmd) is None:  # Still missing after attempted fix
+            raise CheckError(f"{cmd} not found on PATH")
 
     args = version_args or ("--version",)
     try:
@@ -154,10 +168,76 @@ def _require_command(cmd: str, *version_args: str) -> None:
     _print_ok(f"{cmd} {version_line}")
 
 
+def _attempt_install_dependency(dep: str) -> bool:
+    """Attempt to silently install *dep* on Windows using Chocolatey or Winget.
+
+    The implementation is best-effort: it executes the first available package
+    manager and captures its exit status. **No** exception is propagated – the
+    caller must inspect the returned *bool*.
+    """
+
+    logging.info("Attempting self-heal install for dependency: %s", dep)
+
+    # Only Windows is supported for automated install right now.
+    if not sys.platform.startswith("win"):
+        logging.info("Self-heal skipped for %s – unsupported platform (%s)", dep, sys.platform)
+        return False
+
+    # Decide which package manager to use.
+    if shutil.which("choco"):
+        cmd = ["choco", "install", "-y", dep]
+    elif shutil.which("winget"):
+        # winget IDs are typically in the form *Publisher.App*. Allow caller to
+        # pass either the explicit ID or the bare command name.
+        cmd = ["winget", "install", "--id", dep, "-e", "--silent"]
+    else:
+        logging.info("No recognised Windows package manager found – aborting self-heal for %s", dep)
+        return False
+
+    try:
+        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        logging.info("Self-heal install succeeded for %s", dep)
+        return True
+    except subprocess.CalledProcessError as exc:
+        logging.error("Self-heal install failed for %s: %s", dep, exc)
+        return False
+
+
+def _require_nvidia_driver() -> None:
+    """Ensure the NVIDIA driver (``nvidia-smi``) is available.
+
+    If *nvidia-smi* is missing the function attempts a silent installation via
+    ``_attempt_install_dependency`` and re-checks exactly once.  A *CheckError*
+    is raised if the executable remains unavailable or its version cannot be
+    queried.
+    """
+
+    if shutil.which("nvidia-smi") is None:
+        # First failure – try self-healing once.
+        logging.warning("nvidia-smi not found – NVIDIA driver likely missing. Initiating self-heal.")
+        _attempt_install_dependency("NVIDIA.Display.Driver")  # Winget ID
+
+        # Re-evaluate PATH after attempted install
+        if shutil.which("nvidia-smi") is None:
+            raise CheckError("NVIDIA driver is missing (nvidia-smi not found on PATH)")
+
+    # At this point *nvidia-smi* exists – query driver version for user feedback.
+    try:
+        version = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+            encoding="utf-8",
+            stderr=subprocess.STDOUT,
+        ).strip()
+        _print_ok(f"NVIDIA driver version {version} detected")
+    except Exception as exc:  # pragma: no cover – extremely unlikely path
+        raise CheckError(f"Failed to query NVIDIA driver version via nvidia-smi: {exc}") from exc
+
+
 def main() -> None:  # noqa: D401 – simple glue function
     failures: list[str] = []
 
     checks = [
+        _require_nvidia_driver,  # Task-26: NVIDIA driver must be present first.
         lambda: _require_python((3, 10)),
         _require_pytorch_and_cuda,
         _require_nemo,

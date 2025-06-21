@@ -163,15 +163,15 @@
 - [x] 24.3 Unit test merge of 120 sequential PCM chunks. (commit: task24-spooler-enhancements)
 
 ## 25  Pause & Resume Workflow
-- [ ] 25.1 Bind `Ctrl+Alt+C` hotkey in `hotkey_manager.py` to toggle pause state.
-- [ ] 25.2 Persist pause state in config/state for crash recovery.
-- [ ] 25.3 Toast notifications reflecting pause/resume.
-- [ ] 25.4 Regression test: pause mid-sentence, resume, ensure no audio drop.
+- [x] 25.1 Bind `Ctrl+Alt+C` hotkey in `hotkey_manager.py` to toggle pause state. (commit: task25-pause-hotkey)
+- [x] 25.2 Persist pause state in config/state for crash recovery. (commit: task25-config-persist)
+- [x] 25.3 Toast notifications reflecting pause/resume. (commit: task25-toasts)
+- [x] 25.4 Regression test: pause mid-sentence, resume, ensure no audio drop. (commit: task25-tests)
 
 ## 26  Self-Healing Dependency Checker
-- [ ] 26.1 Extend `system_check.py` to detect missing CUDA/NVIDIA driver actionable fixes.
-- [ ] 26.2 Attempt silent reinstall/update of critical dependencies; log outcome.
-- [ ] 26.3 Unit test: simulate missing driver to validate error path.
+- [x] 26.1 Extend `system_check.py` to detect missing CUDA/NVIDIA driver actionable fixes. (commit: self-heal-dependency-checker)
+- [x] 26.2 Attempt silent reinstall/update of critical dependencies; log outcome. (commit: self-heal-dependency-checker)
+- [x] 26.3 Unit test: simulate missing driver to validate error path. (commit: self-heal-dependency-checker)
 
 ## 27  Dependency Management & Automated Pinning
 - [ ] 27.1 Audit all direct and transitive dependencies; record minimum compatible versions in `requirements.in`.

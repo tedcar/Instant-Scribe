@@ -67,6 +67,8 @@ class _StubNotify:
         self.messages = []
         self.model_states = []
         self.recovery_prompts = 0
+        # Task 25 – track pause/resume notifications
+        self.pause_states = []
 
     def show_transcription(self, text: str, **_):  # noqa: D401 – signature match
         self.messages.append(text)
@@ -76,6 +78,10 @@ class _StubNotify:
 
     def show_recovery_prompt(self):  # noqa: D401 – stub
         self.recovery_prompts += 1
+
+    # Task 25 – stub pause notifications
+    def show_pause_state(self, paused: bool):  # noqa: D401 – stub
+        self.pause_states.append(paused)
 
 
 # 5. Stub TranscriptionWorker – instant response
