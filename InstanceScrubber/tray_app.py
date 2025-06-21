@@ -171,8 +171,7 @@ class TrayApp:
         sizes = [(16, 16), (32, 32)]
         img.save(out_path, format="ICO", sizes=sizes)
 
-    @staticmethod
-    def _create_fallback_image(size: int = 64) -> Image.Image:
+    def _create_fallback_image(self, size: int = 64) -> Image.Image:
         """Return an in-memory green circle placeholder *PIL.Image*."""
         img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
@@ -186,4 +185,44 @@ class TrayApp:
             draw.text(((size - w) / 2, (size - h) / 2), text, font=font, fill="white")
         except Exception:  # pragma: no cover – font issues
             pass
-        return img 
+        return img
+
+    # ------------------------------------------------------------------
+    # Task 33 – VRAM badge helper
+    # ------------------------------------------------------------------
+    def update_vram_badge(self, loaded: bool) -> None:  # noqa: D401 – imperative API
+        """Set a small *green* (loaded) or *red* (unloaded) dot on the tray icon.
+
+        The method attempts to update the icon *in-place* so the user receives
+        immediate visual feedback when the ASR model is automatically unloaded
+        due to low VRAM.
+        """
+
+        if pystray is None or self._icon is None:
+            # Headless test environment – silently ignore.
+            return
+
+        try:
+            base: Image.Image = self._icon.icon  # type: ignore[attr-defined]
+        except AttributeError:
+            base = self._load_or_generate_icon()
+
+        # Draw a small circle in the bottom-right corner.
+        overlay = Image.new("RGBA", base.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        radius = base.size[0] // 8
+        cx = base.size[0] - radius - 4
+        cy = base.size[1] - radius - 4
+        color = "#00AA00" if loaded else "#AA0000"
+        draw.ellipse([(cx - radius, cy - radius), (cx + radius, cy + radius)], fill=color)
+
+        combined = Image.alpha_composite(base.convert("RGBA"), overlay)
+        self._icon.icon = combined  # type: ignore[attr-defined]
+        try:
+            self._icon.update_icon()  # pystray >=0.19 provides *update_icon*
+        except Exception:
+            # Fallback: recreate menu to force repaint (older pystray).
+            try:
+                self._icon.update_menu()
+            except Exception:  # pragma: no cover – best effort
+                pass 

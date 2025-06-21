@@ -39,6 +39,7 @@ from InstanceScrubber.transcription_worker import (
 )
 from InstanceScrubber.spooler import AudioSpooler  # NEW – Task 12
 from InstanceScrubber.silence_pruner import prune_pcm_bytes
+from InstanceScrubber.gpu_monitor import GPUResourceMonitor
 
 __all__ = [
     "ApplicationOrchestrator",
@@ -155,6 +156,9 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             on_exit=self.shutdown,
         )
 
+        # Task 33 – GPU VRAM monitoring
+        self.gpu_monitor = GPUResourceMonitor(self, self.config, self.notification_manager)
+
         # Task 12 & 24 – persistent audio spooler with configurable chunk interval
         self.spooler = AudioSpooler(
             chunk_interval_sec=int(self.config.get("spooler_chunk_interval_sec", 60))
@@ -247,6 +251,13 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         self._is_running = True
         self._log.info("Application started (listening=%s)", self.is_listening)
 
+        # Start GPU monitor **after** successful start so the callback has
+        # full access to running subsystems.
+        try:
+            self.gpu_monitor.start()
+        except Exception as exc:  # pylint: disable=broad-except
+            self._log.debug("GPU monitor failed to start: %s", exc)
+
     # .................................................................
     def shutdown(self) -> None:  # noqa: D401 – imperative API
         """Attempt graceful shutdown of all subsystems."""
@@ -290,6 +301,12 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         try:
             self.spooler.close_session(success=True)
         except Exception:  # pragma: no cover
+            pass
+
+        # Task 33 – stop GPU monitor last since it may call back into worker
+        try:
+            self.gpu_monitor.stop()
+        except Exception:
             pass
 
         self._is_running = False
@@ -413,6 +430,11 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                     if resp.ok:
                         self._model_loaded = True
                         self.notification_manager.show_model_state("loaded")
+                        if hasattr(self.tray_app, "update_vram_badge"):
+                            try:
+                                self.tray_app.update_vram_badge(True)
+                            except Exception:
+                                pass
                         self._log.info("ASR model loaded into VRAM")
                     else:
                         self._log.error("Load model failed: %s", resp.payload)
@@ -449,6 +471,44 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                     self._log.info("Recording paused via user toggle")
                 except Exception as exc:  # pylint: disable=broad-except
                     self._log.error("Unable to pause recording: %s", exc)
+
+    # ------------------------------------------------------------------
+    # Task 33 – GPU auto-unload helpers
+    # ------------------------------------------------------------------
+
+    @property
+    def model_loaded(self) -> bool:  # noqa: D401 – read-only property
+        """Return *True* when the ASR model is currently resident in VRAM."""
+        return self._model_loaded
+
+    def auto_unload_model(self) -> None:  # noqa: D401 – imperative API
+        """Unload the ASR model triggered by **GPUResourceMonitor**.
+
+        The logic mirrors :pyfunc:`_toggle_model_vram` but emits an explicit
+        *auto* log entry and updates the tray badge.
+        """
+
+        with self._lock:
+            if not self._model_loaded:
+                return  # Already unloaded by user / previous auto event
+
+            try:
+                resp = self.worker.unload_model(timeout=30)
+                if resp.ok:
+                    self._model_loaded = False
+                    # Reuse existing notification helper for consistency.
+                    self.notification_manager.show_model_state("unloaded")
+                    # Tray badge helper is *optional* (stubbed in unit-tests)
+                    if hasattr(self.tray_app, "update_vram_badge"):
+                        try:
+                            self.tray_app.update_vram_badge(False)
+                        except Exception:  # pragma: no cover – GUI failure
+                            pass
+                    self._log.warning("ASR model auto-unloaded to free VRAM")
+                else:
+                    self._log.error("Auto-unload model failed: %s", resp.payload)
+            except Exception as exc:  # pylint: disable=broad-except
+                self._log.error("Error during auto-unload: %s", exc)
 
 
 # ---------------------------------------------------------------------------

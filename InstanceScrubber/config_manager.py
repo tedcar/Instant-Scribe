@@ -28,6 +28,9 @@ class ConfigManager:
         "silence_prune_threshold_ms": 120000,  # Task 22 – long-silence pruning (> 2 min)
         # Task 24 – enhanced spooler chunk interval (seconds)
         "spooler_chunk_interval_sec": 60,
+        # Task 33 – GPU resource management
+        "vram_unload_threshold_mb": 1024,  # Auto-unload when free VRAM < 1 GB
+        "gpu_monitor_interval_sec": 5,     # Polling interval in seconds
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

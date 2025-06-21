@@ -206,9 +206,9 @@
 - [x] 32.3 Regression test: induce `ZeroDivisionError`, ensure log file generated and application restarts via watchdog. (commit: crash-reporting-impl)
 
 ## 33  GPU Resource Management Enhancements
-- [ ] 33.1 Integrate `pynvml` to monitor real-time VRAM utilisation.
-- [ ] 33.2 Auto-unload model when VRAM free < configurable threshold (default 1 GB).
-- [ ] 33.3 Notify user via toast and tray icon badge when automatic unload occurs.
+- [x] 33.1 Integrate `pynvml` to monitor real-time VRAM utilisation. (commit: task33-gpu-monitor)
+- [x] 33.2 Auto-unload model when VRAM free < configurable threshold (default 1 GB). (commit: task33-gpu-monitor)
+- [x] 33.3 Notify user via toast and tray icon badge when automatic unload occurs. (commit: task33-gpu-monitor)
 
 ## 34  Advanced Testing Infrastructure
 - [ ] 34.1 Reach 90 % line coverage using `pytest-cov` (up from 80 %).

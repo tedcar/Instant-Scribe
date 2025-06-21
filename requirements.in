@@ -33,4 +33,6 @@ black==23.12.1
 isort==5.13.2
 flake8==6.1.0
 mypy==1.8.0
-pre-commit==3.6.0 
+pre-commit==3.6.0
+
+pynvml==11.5.0
