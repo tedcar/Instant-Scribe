@@ -56,9 +56,22 @@ def _spawn_child(cmd: list[str] | str) -> subprocess.Popen:  # noqa: D401
         # therefore we execute through the shell which matches the invocation style
         # used by the unit-tests.
         logging.info("Launching child process: %s", cmd)
+        # Flush to guarantee log entry is written for unit-tests.
+        for h in logging.getLogger().handlers:
+            try:
+                h.flush()
+            except Exception:
+                pass
         return subprocess.Popen(cmd, shell=True)
 
     logging.info("Launching child process: %s", cmd)
+    # Flush to guarantee log entry is written for unit-tests.
+    for h in logging.getLogger().handlers:
+        try:
+            h.flush()
+        except Exception:
+            pass
+
     return subprocess.Popen(cmd)
 
 
@@ -75,6 +88,12 @@ def main(argv: list[str] | None = None) -> None:  # noqa: D401 – CLI entry-poi
         proc.wait()
         exit_code = proc.returncode
         logging.warning("Child process terminated with exit code %s", exit_code)
+        # Flush to ensure test can read this line before process termination.
+        for h in logging.getLogger().handlers:
+            try:
+                h.flush()
+            except Exception:
+                pass
 
         # Break-out conditions -------------------------------------------------
         if args.once or exit_code == 0:
