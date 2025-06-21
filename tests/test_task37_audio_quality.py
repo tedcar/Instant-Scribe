@@ -3,7 +3,7 @@ from __future__ import annotations
 """Tests covering Task 37 – Audio Quality Optimisations.
 
 These focus on **the whole feature** rather than the minute implementation
--details:
+--details:
 
 1. Pre-processing pipeline (AGC + noise-suppression) must preserve PCM length
    and, when AGC is enabled, bring the RMS level closer to the target −20 dBFS.
@@ -11,16 +11,27 @@ These focus on **the whole feature** rather than the minute implementation
    *stub* mode so that CI can run it without the heavyweight GPU model.
 """
 
-import inspect
+# ---------------------------------------------------------------------------
+# Standard library imports
+# ---------------------------------------------------------------------------
+
 import math
 import subprocess
 import sys
 from pathlib import Path
 
-import numpy as np
-import pytest
+# ---------------------------------------------------------------------------
+# Third-party imports – add *type: ignore* to silence missing-stub warnings.
+# ---------------------------------------------------------------------------
 
-ROOT_DIR = Path(inspect.getfile(inspect.currentframe())).resolve().parents[1]
+import numpy as np  # type: ignore
+import pytest  # type: ignore
+
+# ---------------------------------------------------------------------------
+# Repository path plumbing – use __file__ to avoid FrameType typing issues
+# ---------------------------------------------------------------------------
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
 BENCH_SCRIPT = ROOT_DIR / "benchmarks" / "audio_quality_benchmark.py"
 
 sys.path.insert(0, str(ROOT_DIR))

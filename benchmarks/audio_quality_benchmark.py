@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 import logging
 
-import numpy as np
+import numpy as np  # type: ignore
 
 from InstanceScrubber.audio_processing import preprocess_audio
 from InstanceScrubber.transcription_worker import TranscriptionEngine

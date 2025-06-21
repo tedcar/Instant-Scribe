@@ -19,7 +19,9 @@ from __future__ import annotations
 import logging
 from typing import Final
 
-import numpy as np
+# `numpy` is a hard runtime dependency but type stubs may be missing in some
+# environments; suppress *missing-import* warnings emitted by static checkers.
+import numpy as np  # type: ignore
 
 # ---------------------------------------------------------------------------
 # Optional third-party dependencies – soft import with graceful degradation
