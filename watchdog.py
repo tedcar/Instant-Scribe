@@ -14,6 +14,7 @@ def _configure_logging(log_path: Path) -> None:
         filename=str(log_path),
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
+        encoding="utf-8",
         force=True,  # Override any earlier logging configuration
     )
 
@@ -51,7 +52,12 @@ def _build_default_cmd() -> list[str]:  # noqa: D401
 def _spawn_child(cmd: list[str] | str) -> subprocess.Popen:  # noqa: D401
     """Spawn *cmd* via *subprocess.Popen* returning the process instance.*"""
     if isinstance(cmd, str):
-        cmd = shlex.split(cmd)
+        # On Windows `shlex.split` may break quoted arguments (e.g. "python -c '...'"),
+        # therefore we execute through the shell which matches the invocation style
+        # used by the unit-tests.
+        logging.info("Launching child process: %s", cmd)
+        return subprocess.Popen(cmd, shell=True)
+
     logging.info("Launching child process: %s", cmd)
     return subprocess.Popen(cmd)
 
@@ -75,7 +81,13 @@ def main(argv: list[str] | None = None) -> None:  # noqa: D401 – CLI entry-poi
             logging.info("Watchdog exiting (once=%s, exit_code=%s)", args.once, exit_code)
             break
 
-        logging.info("Restarting child in %.1f s …", args.sleep)
+        logging.info("Restarting child in %.1f s ...", args.sleep)
+        # Ensure line is flushed so integration tests can detect it quickly.
+        for h in logging.getLogger().handlers:
+            try:
+                h.flush()
+            except Exception:
+                pass
         time.sleep(args.sleep)
 
 

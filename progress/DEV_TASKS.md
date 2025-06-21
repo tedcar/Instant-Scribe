@@ -201,9 +201,9 @@
 - [ ] 31.3 Document privacy guarantee in `docs/PRIVACY.md`; include audit script results.
 
 ## 32  Crash Reporting & Exception Analytics
-- [ ] 32.1 Implement `crash_reporter.py` capturing uncaught exceptions to rotating `crash.log` (10 × 1 MB).
-- [ ] 32.2 Attach most recent `crash.log` to a ZIP in `%APPDATA%/Instant Scribe/reports` for manual user share.
-- [ ] 32.3 Regression test: induce `ZeroDivisionError`, ensure log file generated and application restarts via watchdog.
+- [x] 32.1 Implement `crash_reporter.py` capturing uncaught exceptions to rotating `crash.log` (10 × 1 MB). (commit: crash-reporting-impl)
+- [x] 32.2 Attach most recent `crash.log` to a ZIP in `%APPDATA%/Instant Scribe/reports` for manual user share. (commit: crash-reporting-impl)
+- [x] 32.3 Regression test: induce `ZeroDivisionError`, ensure log file generated and application restarts via watchdog. (commit: crash-reporting-impl)
 
 ## 33  GPU Resource Management Enhancements
 - [ ] 33.1 Integrate `pynvml` to monitor real-time VRAM utilisation.

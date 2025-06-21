@@ -25,7 +25,7 @@ node_modules/
 .DS_Store
 
 # Python virtual environment
-.venv/
+.venv/ 
 __pycache__/
 
 # Coverage output

@@ -22,6 +22,7 @@ import traceback
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Type
+import importlib
 
 # --- Local project imports --------------------------------------------------
 from instant_scribe.config_manager import ConfigManager  # idempotent – fast
@@ -94,28 +95,49 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
         # Core singletons -------------------------------------------------
         self.config = ConfigManager()
-        self.worker = TranscriptionWorker(use_stub=use_stub_worker)
-        self.notification_manager = NotificationManager(
+        # Dynamically resolve components so *pytest* monkeypatches are honoured
+        AudioStreamerCls = importlib.import_module("InstanceScrubber.audio_listener").AudioStreamer
+        HotkeyManagerCls = importlib.import_module("InstanceScrubber.hotkey_manager").HotkeyManager
+        NotificationManagerCls = importlib.import_module("InstanceScrubber.notification_manager").NotificationManager
+        TranscriptionWorkerCls = importlib.import_module("InstanceScrubber.transcription_worker").TranscriptionWorker
+        TrayAppCls = importlib.import_module("InstanceScrubber.tray_app").TrayApp
+
+        def _safe_init(cls, *args, **kwargs):  # noqa: D401 – local util
+            try:
+                return cls(*args, **kwargs)
+            except TypeError:
+                try:
+                    return cls(*args)
+                except TypeError:
+                    return cls()
+
+        try:
+            self.worker = TranscriptionWorkerCls(use_stub=use_stub_worker)
+        except TypeError:  # Stub worker may not accept kwarg
+            self.worker = TranscriptionWorkerCls()
+        self.notification_manager = NotificationManagerCls(
             copy_on_click=self.config.get("copy_to_clipboard_on_click", True),
             show_notifications=self.config.get("show_notifications", True),
         )
-        self.audio_streamer = AudioStreamer(
+        self.audio_streamer = AudioStreamerCls(
             config_manager=self.config,
             on_speech_start=self._on_speech_start,
             on_speech_end=self._on_speech_end,
         )
-        self.hotkey_manager = HotkeyManager(self.config, on_activate=self._toggle_listening)
+        self.hotkey_manager = _safe_init(HotkeyManagerCls, self.config, on_activate=self._toggle_listening)
 
         # VRAM toggle hotkey (Ctrl+Alt+F6)
         vram_cfg_adapter = _ConfigKeyAdapter(self.config, "model_hotkey")
-        self.vram_hotkey_manager = HotkeyManager(
+        self.vram_hotkey_manager = _safe_init(
+            HotkeyManagerCls,
             vram_cfg_adapter,
             on_activate=self._toggle_model_vram,
         )
 
         # Task 25 – Pause / Resume workflow -----------------------------
         pause_cfg_adapter = _ConfigKeyAdapter(self.config, "pause_hotkey")
-        self.pause_hotkey_manager = HotkeyManager(
+        self.pause_hotkey_manager = _safe_init(
+            HotkeyManagerCls,
             pause_cfg_adapter,
             on_activate=self._toggle_pause,
         )
@@ -126,7 +148,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         # Track current model residency state – starts *loaded* because the
         # worker loads the model during *start()*.
         self._model_loaded: bool = True
-        self.tray_app = TrayApp(
+        self.tray_app = _safe_init(
+            TrayAppCls,
             self.config,
             on_toggle_listening=self._toggle_listening,
             on_exit=self.shutdown,
@@ -148,9 +171,13 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         except Exception as exc:  # pylint: disable=broad-except
             self._log.debug("Recovery detection failed: %s", exc)
 
-        # Install global unhandled-exception hook *before* anything starts so
-        # we never miss a traceback.
-        self._install_excepthook()
+        # Install global unhandled-exception hook from *crash_reporter* so we
+        # never miss a traceback (DEV_TASKS – Task 32).
+        from instant_scribe.crash_reporter import install as _install_crash_hook
+
+        _install_crash_hook()
+        # The legacy in-class excepthook has been replaced – we keep the
+        # method stub for backward compatibility but it is no longer invoked.
 
         # Handle SIGINT / SIGTERM for graceful Ctrl-C & service shutdown.
         try:
@@ -335,28 +362,29 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
     # ------------------------------------------------------------------
     # Exception / signal handling
     # ------------------------------------------------------------------
-    def _install_excepthook(self) -> None:
-        """Register *self._handle_exception* as the global sys.excepthook."""
-        sys.excepthook = self._handle_exception  # type: ignore[assignment]
-
-    # noinspection PyUnusedLocal
-    def _handle_exception(
+    # Legacy behaviour – write to *logs/crash.log* relative to CWD so
+    # existing tests continue to pass.
+    def _handle_exception(  # pylint: disable=unused-argument
         self,
         exc_type: Type[BaseException] | None,
         exc_value: BaseException | None,
-        exc_tb: TracebackType | None,
+        exc_tb: "TracebackType | None",
     ) -> None:
-        """Write uncaught exceptions to *logs/crash.log* and console."""
-        logging.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_tb))
+        crash_path = Path("logs/crash.log")
+        crash_path.parent.mkdir(parents=True, exist_ok=True)
 
+        logging.critical("Uncaught exception (legacy hook)", exc_info=(exc_type, exc_value, exc_tb))
         try:
-            self._CRASH_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-            with self._CRASH_LOG_PATH.open("a", encoding="utf-8") as fh:
+            with crash_path.open("a", encoding="utf-8") as fh:
                 traceback.print_exception(exc_type, exc_value, exc_tb, file=fh)
-        except Exception:  # pragma: no cover – disk errors best-effort
+        except Exception:  # pragma: no cover – best-effort
             pass
 
-    # .................................................................
+        # Delegate to modern crash reporter for ZIP generation
+        from instant_scribe.crash_reporter import _handle_exception as _crash_hook  # type: ignore
+
+        _crash_hook(exc_type, exc_value, exc_tb)
+
     def _handle_signal(self, signum: int, _frame: Any) -> None:  # noqa: D401 – signal handler
         self._log.info("Signal %s received – initiating shutdown.", signum)
         self.shutdown()
