@@ -231,9 +231,9 @@
 - [x] 37.3 Comparative benchmark: WER before/after AGC + noise suppression. (commit: task37-audio-optimisations)
 
 ## 38  Continuous Integration & Release Automation
-- [ ] 38.1 Consolidate lint, test, benchmark, build, sign, and upload steps into a single reusable GitHub Actions workflow.
-- [ ] 38.2 Publish signed installer to GitHub Releases; auto-increment semantic version.
-- [ ] 38.3 Slack/Teams webhook notification on successful release (configurable, defaults to disabled).
+- [x] 38.1 Consolidate lint, test, benchmark, build, sign, and upload steps into a single reusable GitHub Actions workflow. (commit: task38-ci-pipeline)
+- [x] 38.2 Publish signed installer to GitHub Releases; auto-increment semantic version. (commit: task38-ci-pipeline)
+- [x] 38.3 Slack/Teams webhook notification on successful release (configurable, defaults to disabled). (commit: task38-ci-pipeline)
 
 ## 39  Parakeet Model Update Checker (delted task, you should never update the model!, updates can cause instabilities, this a local once and for all setup, the model is already as fast as possible, no need for a better version!)
 - [NO] 39.1 Weekly background job checks Hugging Face for newer Parakeet TDT checkpoints.
