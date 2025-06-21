@@ -16,14 +16,16 @@ alwaysApply: false
   - A command is considered safe when it exits with status `0` in ≤ 30 s under default CI runner resources.
   - For long-running tasks, set `is_background: true` so the pipeline continues.
 
+- **Disable pagers for Git-family commands**
+  - Prefix with `git -c core.pager=cat` or add `--no-pager` flag (e.g. `git --no-pager diff`).
+  - This avoids spawning `less` which blocks the agent.
+
+- **Pipe long output to `cat`**
+  - Any command liable to invoke a pager (e.g. `cargo doc`, `man`, custom CLIs) must end with `| cat`.
+
+- **Timeout safety-net**
+  - If a synchronous command can occasionally hang, wrap it with `timeout 60s …` (Linux/macOS) or `powershell -c "Start-Process … -Wait; if(!$?) { exit 124 }"` on Windows.
+  - Alternatively, set `is_background: true` so the main workflow is not blocked.
+
 - **Examples – good vs bad**
-  ```bash
-  # ✅ Good – non-interactive formatter check
-  run_terminal_cmd: black --check . | cat
-
-  # ❌ Bad – opens Python REPL and hangs the job
-  run_terminal_cmd: python
   ```
-
-- **When in doubt**
-  - Use a scoped one-liner script or add unit tests instead of ad-hoc interactive exploration.
