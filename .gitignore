@@ -27,3 +27,6 @@ node_modules/
 # Python virtual environment
 .venv/
 __pycache__/
+
+# Coverage output
+.coverage

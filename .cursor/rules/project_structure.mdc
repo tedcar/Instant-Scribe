@@ -3,3 +3,32 @@ description:
 globs:
 alwaysApply: false
 ---
+- **Group code by domain and responsibility**
+  - `audio/`, `ipc/`, `ui/`, `core/` sub-packages must contain related modules only – avoid dumping scripts at repository root.
+  - New data or asset files belong under `assets/` or an explicitly named folder; never inside top-level code packages.
+
+- **Keep top-level clutter-free**
+  - Only the following items may live at repo root: `README.md`, `requirements*`, `setup/installer` artefacts, `scripts/`, `tests/`, `progress/`, `context/`, `watchdog.py`, `.cursor/`, `envcheck.json`.
+  - Temporary or generated files must write to `dist/`, `build/`, or OS temp dirs and be .gitignored.
+
+- **File naming conventions**
+  - Python modules: `snake_case.py`.
+  - Test modules: `test_<module>.py` placed under `tests/` mirroring package path when feasible.
+  - Config/spec files: use clear descriptor e.g. `InstantScribe.spec`, `installer.cfg`.
+
+- **Ensure packaging artefacts remain clean**
+  - PyInstaller build directories (`build/`, `dist/`) must never be committed.
+  - Use `--clean` flag (already in tests) when invoking PyInstaller.
+
+- **Review orphaned or outdated files**
+  - Stale prototype scripts should be deleted or moved to `archive/`.
+  - CI lint step (planned Task 28) should fail if files are found outside the approved locations.
+
+- **Examples & anti-patterns**
+```python
+# ✅ DO – add new class in the correct domain package
+audio/noise_suppression.py
+
+# ❌ DON'T – add misc util at project root
+random_util.py
+```

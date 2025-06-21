@@ -180,10 +180,10 @@
 - [x] 27.4 Document upgrade policy and review checklist in `docs/DEPENDENCIES.md`. (commit: task27-dependency-management)
 
 ## 28  Code Style, Linting & Static Analysis
-- [ ] 28.1 Adopt `black` + `isort` for formatting; enforce via pre-commit hook.
-- [ ] 28.2 Integrate `flake8` with custom rules mirroring project cursor-rules.
-- [ ] 28.3 Introduce `mypy` type-checking across all modules; target `strict` mode for new code.
-- [ ] 28.4 CI job fails on style or typing errors; annotate offending lines in PR review.
+- [x] 28.1 Adopt `black` + `isort` for formatting; enforce via pre-commit hook. (commit: task28-code-style)
+- [x] 28.2 Integrate `flake8` with custom rules mirroring project cursor-rules. (commit: task28-code-style)
+- [x] 28.3 Introduce `mypy` type-checking across all modules; target `strict` mode for new code. (commit: task28-code-style)
+- [x] 28.4 CI job fails on style or typing errors; annotate offending lines in PR review. (commit: task28-code-style)
 
 ## 29  Continuous Performance Benchmarking
 - [ ] 29.1 Implement `benchmarks/rtf_benchmark.py` measuring Real-Time-Factor (RTF) for 30-s sample audio.

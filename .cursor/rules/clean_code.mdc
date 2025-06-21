@@ -3,3 +3,37 @@ description:
 globs:
 alwaysApply: false
 ---
+- **Keep the repository free of orphaned or dead code**
+  - Delete experimental scripts once migrated into production modules or move them under `archive/` (and .gitignore).
+  - Any Python file not referenced by imports, tests, or packaging specs after 2 releases must be removed.
+
+- **Run automated formatters on every commit**
+  - `black` and `isort` are the canonical formatters (see planned *Task 28*).
+  - Never manually re-order imports or tweak quotations – defer to tool defaults.
+  - Example:
+    ```bash
+    black . && isort .
+    ```
+
+- **Import hygiene**
+  - Top-level modules **MUST NOT** perform heavyweight imports (torch, pyaudio, NeMo) at import time.
+  - Guard them behind `if TYPE_CHECKING:` or lazy-import inside functions to keep unit tests fast.
+
+- **Folder & file organisation**
+  - Follow [_folder_structure.mdc_](mdc:.cursor/rules/folder_structure.mdc) and [_project_structure.mdc_](mdc:.cursor/rules/project_structure.mdc).
+  - Never introduce new top-level directories without a *Cursor rule* and update to *DEV_TASKS.md*.
+
+- **Naming & casing**
+  - Modules: `snake_case.py`  •  Packages: `snake_case`  •  Classes: `PascalCase`  •  Constants: `UPPER_SNAKE`.
+
+- **Examples – good vs bad**
+  ```python
+  # ✅ Lazy import keeps startup fast
+  def transcribe(path: str) -> str:
+      import nemo.collections.asr as nemo_asr  # imported inside function
+      model = nemo_asr.models.ASRModel.from_pretrained("nvidia/parakeet-tdt-0.6b-v2")
+      return model.transcribe([path])[0]
+
+  # ❌ Heavy import at module top-level slows tests & CLI startup
+  import nemo.collections.asr as nemo_asr  # <- Avoid
+  ```

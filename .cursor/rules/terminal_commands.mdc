@@ -1,0 +1,29 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+- **Never spawn an interactive shell in CI or via AI automation**
+  - ALWAYS append non-interactive flags (e.g. `--yes`, `--quiet`, `| cat`) when running tools that may wait for user input.
+  - Use `python - <<\"PY\" … PY` **only** for short, self-terminating one-liners.
+  - NEVER call plain `python` (or `pwsh`, `bash`) without arguments – it opens a REPL that blocks the agent.
+
+- **Guard against PowerShell PSReadLine glitches**
+  - Prefer `python -m module …` rather than shell aliases.
+  - Wrap Windows commands with `cmd /c` only when necessary; verify they exit quickly.
+
+- **Validate exit behaviour before committing**
+  - A command is considered safe when it exits with status `0` in ≤ 30 s under default CI runner resources.
+  - For long-running tasks, set `is_background: true` so the pipeline continues.
+
+- **Examples – good vs bad**
+  ```bash
+  # ✅ Good – non-interactive formatter check
+  run_terminal_cmd: black --check . | cat
+
+  # ❌ Bad – opens Python REPL and hangs the job
+  run_terminal_cmd: python
+  ```
+
+- **When in doubt**
+  - Use a scoped one-liner script or add unit tests instead of ad-hoc interactive exploration.
