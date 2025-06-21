@@ -221,9 +221,9 @@
 - [x] 35.3 Integration test: backup-then-restore cycle preserves file hashes. (commit: task35-archive-backup-restore)
 
 ## 36  Clipboard Integrity Enhancements
-- [ ] 36.1 Add CRC32 checksum to clipboard payload; verify after paste.
-- [ ] 36.2 On checksum mismatch, trigger fallback file write (leverages Task 23 logic).
-- [ ] 36.3 Document rare clipboard failure scenarios and mitigation steps.
+- [x] 36.1 Add CRC32 checksum to clipboard payload; verify after paste. (commit: task36-clipboard-crc32)
+- [x] 36.2 On checksum mismatch, trigger fallback file write (leverages Task 23 logic). (commit: task36-clipboard-crc32)
+- [x] 36.3 Document rare clipboard failure scenarios and mitigation steps. (commit: task36-clipboard-crc32)
 
 ## 37  Audio Quality Optimisations
 - [ ] 37.1 Implement optional automatic gain control (AGC) using `pydub`.

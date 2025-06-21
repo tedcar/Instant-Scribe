@@ -59,4 +59,21 @@ Downloads originate from the Hugging Face CDN and can be ~1 GB. If the download 
 ## 5. Still stuck?
 
 1. Enable verbose logging by adding `"log_level": "DEBUG"` to `config.json` and restart the app.
-2. Open an issue on GitHub with the generated `logs/app.log` and `crash.log` files attached. 
+2. Open an issue on GitHub with the generated `logs/app.log` and `crash.log` files attached.
+
+---
+
+## 6. Clipboard integrity failures (CRC32 mismatch)
+
+**Symptoms**
+- After pressing the copy notification, a fallback `.txt` file appears in the archive directory instead of the text being available on the clipboard.
+- Logs contain a line similar to `Clipboard verification mismatch` or `CRC32 verification failed`.
+
+**Why this happens**
+Windows' clipboard is occasionally locked or modified by third-party clipboard managers or remote-desktop sessions. In very rare edge-cases the data returned by `Ctrl+V` differs from what was written. Instant Scribe now protects users by attaching a CRC32 checksum to every copy operation and verifying the round-trip.
+
+**Fix / Mitigation**
+1. Close aggressive clipboard utilities (e.g. password managers with history, cloud-sync clipboards).
+2. Retry the copy action – Instant Scribe will attempt three times by default before falling back.
+3. If you routinely work in remote sessions (RDP / VM), consider increasing the `clipboard_retry_delay` in `config.json` to `0.5` seconds.
+4. If fallback files are still created, copy the desired text manually from the generated `.txt` file (located in the working directory) and report the incident with the relevant `logs/app.log` excerpt. 

@@ -27,6 +27,7 @@ import logging
 import time
 import re
 import textwrap
+import binascii
 
 __all__ = ["copy_with_verification"]
 
@@ -102,10 +103,14 @@ def copy_with_verification(
         _LOG.debug("Nothing to copy – empty payload")
         return True
 
-    # Transparent optimisation – avoid copying gargantuan strings more than
-    # once when the verification strategy can be downgraded to a checksum.
-    # However, Task 23 explicitly mentions 1 billion-char stress test so we
-    # preserve the existing copy-then-paste approach to keep semantics simple.
+    # ------------------------------------------------------------------
+    # Prepare CRC32 checksum for integrity verification (Task 36)
+    # ------------------------------------------------------------------
+    try:
+        original_crc = binascii.crc32(payload.encode("utf-8")) & 0xFFFFFFFF
+    except Exception as exc:  # pragma: no cover – should never fail for str
+        _LOG.warning("Failed to compute CRC32 for payload: %s", exc)
+        original_crc = None  # Fallback to equality comparison
 
     # ------------------------------------------------------------------
     # Attempt clipboard copy with verification loop
@@ -123,9 +128,29 @@ def copy_with_verification(
             # time to propagate the data.
             try:
                 time.sleep(retry_delay)
-                if pyperclip.paste() == payload:
-                    _LOG.debug("Clipboard verification succeeded on attempt %d", attempt)
+                pasted = pyperclip.paste()
+
+                # ------------------------------------------------------------------
+                # Integrity verification – favour CRC32 to avoid full string compare
+                # ------------------------------------------------------------------
+                if original_crc is not None:
+                    try:
+                        pasted_crc = binascii.crc32(pasted.encode("utf-8")) & 0xFFFFFFFF
+                    except Exception as exc:  # pragma: no cover – encode error
+                        _LOG.debug("Failed to compute CRC32 for pasted data: %s", exc)
+                        pasted_crc = None
+                else:
+                    pasted_crc = None
+
+                if pasted_crc is not None and pasted_crc == original_crc and len(pasted) == len(payload):
+                    _LOG.debug("Clipboard CRC32 verification succeeded on attempt %d", attempt)
                     return True
+
+                # Fallback to legacy equality check if CRC unavailable or mismatch
+                if pasted == payload:
+                    _LOG.debug("Clipboard verification (equality) succeeded on attempt %d", attempt)
+                    return True
+
                 _LOG.debug("Clipboard verification mismatch on attempt %d", attempt)
             except pyperclip.PyperclipException as exc:
                 _LOG.debug("Clipboard paste failed on attempt %d/%d: %s", attempt, max_retries, exc)
