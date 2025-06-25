@@ -251,9 +251,9 @@
 - [x] 41.3 Add architectural decision records (ADRs) following the MADR template. (commit: task41-modularisation)
 
 ## 42  Legal & Compliance Review
-- [ ] 42.1 Conduct license audit for all dependencies; record SPDX identifiers.
-- [ ] 42.2 Add NOTICE file and third-party license aggregation step to installer.
-- [ ] 42.3 Verify export-control compliance for cryptographic components.
+- [x] 42.1 Conduct license audit for all dependencies; record SPDX identifiers. (commit: task42-legal-compliance)
+- [x] 42.2 Add NOTICE file and third-party license aggregation step to installer. (commit: task42-legal-compliance)
+- [x] 42.3 Verify export-control compliance for cryptographic components. (commit: task42-legal-compliance)
 
 ## 43  Telemetry & Observability
 - [ ] 43.1 Integrate optional runtime metrics collection via OpenTelemetry (opt-out by default); log to `metrics/` folder.

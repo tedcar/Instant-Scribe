@@ -40,6 +40,7 @@ from InstanceScrubber.transcription_worker import (
 from InstanceScrubber.spooler import AudioSpooler  # NEW – Task 12
 from InstanceScrubber.silence_pruner import prune_pcm_bytes
 from InstanceScrubber.gpu_monitor import GPUResourceMonitor
+from InstanceScrubber.telemetry_manager import TelemetryManager  # NEW – Task 43
 
 __all__ = [
     "ApplicationOrchestrator",
@@ -192,6 +193,9 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
             chunk_interval_sec=int(self.config.get("spooler_chunk_interval_sec", 60))
         )
 
+        # Task 43 – telemetry & observability
+        self.telemetry_manager = TelemetryManager(self.config)
+
         # On startup detect incomplete recording and notify user.
         try:
             if force_recover or AudioSpooler.incomplete_session_exists():
@@ -337,6 +341,12 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         except Exception:
             pass
 
+        # Task 43 – stop telemetry manager
+        try:
+            self.telemetry_manager.stop()
+        except Exception:
+            pass
+
         self._is_running = False
         self._log.info("Shutdown complete")
 
@@ -356,6 +366,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                     self.is_paused = False
                     self.config.set("paused", False)
                     self._log.info("Listening stopped via user toggle")
+                    # Task 43 – Record telemetry event
+                    self.telemetry_manager.record_event("listening_stopped")
                 except Exception as exc:  # pylint: disable=broad-except
                     self._log.warning("Unable to stop listener: %s", exc)
             else:
@@ -367,6 +379,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                     self.is_paused = False  # Ensure paused flag reset
                     self.config.set("paused", False)
                     self._log.info("Listening started via user toggle")
+                    # Task 43 – Record telemetry event
+                    self.telemetry_manager.record_event("listening_started")
                 except Exception as exc:  # pylint: disable=broad-except
                     self._log.error("Failed to start listener: %s", exc)
 

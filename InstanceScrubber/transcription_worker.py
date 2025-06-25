@@ -33,6 +33,11 @@ import numpy as np
 # ---------------------------------------------------------------------------
 
 try:
+    # Task 43 - Workaround for NeMo Windows compatibility issue
+    # See: https://github.com/NVIDIA/NeMo/issues/12858
+    import signal
+    if not hasattr(signal, 'SIGKILL'):
+        signal.SIGKILL = signal.SIGTERM
     import importlib
     nemo_asr = importlib.import_module("nemo.collections.asr")  # type: ignore
 except Exception:  # noqa: BLE001 – broad except on purpose; we fall back to stub

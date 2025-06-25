@@ -34,6 +34,12 @@ class ConfigManager:
         # Task 37 – audio quality optimisations
         "enable_agc": False,
         "enable_noise_suppression": False,
+        # Task 43 – telemetry & observability
+        "telemetry_enabled": False,  # Opt-out by default
+        # Task 44 – accessibility & UX enhancements
+        "high_contrast_icons": False,  # Use high-contrast icon variants
+        # Task 45 – high-DPI & multi-monitor support
+        "dpi_check_interval_sec": 5,  # How often to check for DPI changes
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

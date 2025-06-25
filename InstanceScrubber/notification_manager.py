@@ -125,6 +125,10 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             toast = Toast()  # type: ignore[call-arg]
         toast.text_fields = [self._DEFAULT_TITLE, text]
 
+        # Task 44 – Accessibility: Add attribution text for screen readers
+        if hasattr(toast, 'attribution_text'):
+            toast.attribution_text = "Transcription complete"
+
         if copy_enabled:
             toast.on_activated = lambda: self._copy_to_clipboard(text)
 
@@ -172,6 +176,10 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             toast = Toast()  # type: ignore[call-arg]
         toast.text_fields = [title, message]
 
+        # Task 44 – Accessibility: Add attribution text for screen readers
+        if hasattr(toast, 'attribution_text'):
+            toast.attribution_text = "Instant Scribe - Model Status"
+
         try:
             self._toaster.show_toast(toast)  # type: ignore[arg-type]
         except Exception as exc:  # pragma: no cover – runtime path
@@ -211,6 +219,10 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
 
         toast.text_fields = [title, message]
 
+        # Task 44 – Accessibility: Add attribution text for screen readers
+        if hasattr(toast, 'attribution_text'):
+            toast.attribution_text = "Instant Scribe - Recording Status"
+
         try:
             self._toaster.show_toast(toast)  # type: ignore[arg-type]
         except Exception as exc:  # pragma: no cover – runtime path
@@ -247,6 +259,10 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
         else:
             toast = Toast()  # type: ignore[call-arg]
         toast.text_fields = [title, message]
+
+        # Task 44 – Accessibility: Add attribution text for screen readers
+        if hasattr(toast, 'attribution_text'):
+            toast.attribution_text = "Instant Scribe - Recovery"
 
         try:
             self._toaster.show_toast(toast)  # type: ignore[arg-type]
