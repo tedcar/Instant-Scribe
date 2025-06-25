@@ -256,17 +256,17 @@
 - [x] 42.3 Verify export-control compliance for cryptographic components. (commit: task42-legal-compliance)
 
 ## 43  Telemetry & Observability
-- [ ] 43.1 Integrate optional runtime metrics collection via OpenTelemetry (opt-out by default); log to `metrics/` folder.
-- [ ] 43.2 Unit-test that disabling telemetry removes any outbound network calls (depends on Task 31).
+- [x] 43.1 Integrate optional runtime metrics collection via OpenTelemetry (opt-out by default); log to `metrics/` folder.
+- [x] 43.2 Unit-test that disabling telemetry removes any outbound network calls (depends on Task 31).
 
 ## 44  Accessibility & UX Enhancements
-- [ ] 44.1 Produce high-contrast tray icons and 32×32, 16×16 variants; validate against Windows high-contrast themes.
-- [ ] 44.2 Ensure toast notifications are readable by Windows Narrator; add `aria-label` equivalents where available.
-- [ ] 44.3 Document accessibility compliance strategy in `docs/ACCESSIBILITY.md`.
+- [x] 44.1 Produce high-contrast tray icons and 32×32, 16×16 variants; validate against Windows high-contrast themes.
+- [x] 44.2 Ensure toast notifications are readable by Windows Narrator; add `aria-label` equivalents where available.
+- [x] 44.3 Document accessibility compliance strategy in `docs/ACCESSIBILITY.md`.
 
 ## 45  High-DPI & Multi-Monitor Support
-- [ ] 45.1 Verify tray icon renders crisply on 4K and 8K displays; supply `.ico` containing 256×256 asset.
-- [ ] 45.2 Detect DPI changes at runtime and reload icon without app restart.
+- [x] 45.1 Verify tray icon renders crisply on 4K and 8K displays; supply `.ico` containing 256×256 asset.
+- [x] 45.2 Detect DPI changes at runtime and reload icon without app restart.
 
 ## 46  Portable Mode Distribution
 - [ ] 46.1 Provide ZIP-based portable build skipping registry writes (depends on Task 15 Packaging).
