@@ -34,6 +34,8 @@ class ConfigManager:
         # Task 37 – audio quality optimisations
         "enable_agc": False,
         "enable_noise_suppression": False,
+        # Task 43 – Telemetry & Observability (disabled by default)
+        "telemetry_enabled": False,
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

@@ -256,8 +256,8 @@
 - [ ] 42.3 Verify export-control compliance for cryptographic components.
 
 ## 43  Telemetry & Observability
-- [ ] 43.1 Integrate optional runtime metrics collection via OpenTelemetry (opt-out by default); log to `metrics/` folder.
-- [ ] 43.2 Unit-test that disabling telemetry removes any outbound network calls (depends on Task 31).
+- [x] 43.1 Integrate optional runtime metrics collection via OpenTelemetry (opt-out by default); log to `metrics/` folder. (commit: task43-telemetry)
+- [x] 43.2 Unit-test that disabling telemetry removes any outbound network calls (depends on Task 31). (commit: task43-telemetry)
 
 ## 44  Accessibility & UX Enhancements
 - [ ] 44.1 Produce high-contrast tray icons and 32×32, 16×16 variants; validate against Windows high-contrast themes.

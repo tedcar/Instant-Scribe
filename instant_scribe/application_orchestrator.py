@@ -40,6 +40,7 @@ from InstanceScrubber.transcription_worker import (
 from InstanceScrubber.spooler import AudioSpooler  # NEW – Task 12
 from InstanceScrubber.silence_pruner import prune_pcm_bytes
 from InstanceScrubber.gpu_monitor import GPUResourceMonitor
+from InstanceScrubber.telemetry_manager import TelemetryManager
 
 __all__ = [
     "ApplicationOrchestrator",
@@ -186,6 +187,14 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
         # Task 33 – GPU VRAM monitoring
         self.gpu_monitor = GPUResourceMonitor(self, self.config, self.notification_manager)
+
+        # Task 43 – Optional telemetry (disabled by default via config)
+        try:
+            self.telemetry_manager = TelemetryManager(self.config)
+        except Exception as exc:  # pylint: disable=broad-except
+            # Telemetry must never break application startup
+            self._log.debug("Telemetry initialisation failed: %s", exc)
+            self.telemetry_manager = None
 
         # Task 12 & 24 – persistent audio spooler with configurable chunk interval
         self.spooler = AudioSpooler(
@@ -335,6 +344,13 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         try:
             self.gpu_monitor.stop()
         except Exception:
+            pass
+
+        # Task 43 – flush telemetry exporter
+        try:
+            if self.telemetry_manager is not None:
+                self.telemetry_manager.stop()
+        except Exception:  # pragma: no cover – best-effort
             pass
 
         self._is_running = False

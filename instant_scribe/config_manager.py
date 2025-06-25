@@ -30,6 +30,8 @@ class ConfigManager:
         # Task 25 – Pause / Resume workflow defaults
         "pause_hotkey": "ctrl+alt+c",
         "paused": False,
+        # Task 43 – Telemetry & Observability (disabled by default)
+        "telemetry_enabled": False,
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:
