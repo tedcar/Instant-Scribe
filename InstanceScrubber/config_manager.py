@@ -34,6 +34,8 @@ class ConfigManager:
         # Task 37 – audio quality optimisations
         "enable_agc": False,
         "enable_noise_suppression": False,
+        # Task 44 – accessibility high-contrast support
+        "high_contrast_icons": False,
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

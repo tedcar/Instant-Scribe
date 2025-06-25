@@ -260,9 +260,9 @@
 - [ ] 43.2 Unit-test that disabling telemetry removes any outbound network calls (depends on Task 31).
 
 ## 44  Accessibility & UX Enhancements
-- [ ] 44.1 Produce high-contrast tray icons and 32×32, 16×16 variants; validate against Windows high-contrast themes.
-- [ ] 44.2 Ensure toast notifications are readable by Windows Narrator; add `aria-label` equivalents where available.
-- [ ] 44.3 Document accessibility compliance strategy in `docs/ACCESSIBILITY.md`.
+- [x] 44.1 Produce high-contrast tray icons and 32×32, 16×16 variants; validate against Windows high-contrast themes. (commit: task44-accessibility)
+- [x] 44.2 Ensure toast notifications are readable by Windows Narrator; add `aria-label` equivalents where available. (commit: task44-accessibility)
+- [x] 44.3 Document accessibility compliance strategy in `docs/ACCESSIBILITY.md`. (commit: task44-accessibility)
 
 ## 45  High-DPI & Multi-Monitor Support
 - [ ] 45.1 Verify tray icon renders crisply on 4K and 8K displays; supply `.ico` containing 256×256 asset.

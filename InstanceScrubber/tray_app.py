@@ -32,6 +32,7 @@ class TrayApp:
     """
 
     _ICON_REL_PATH = "assets/icon.ico"
+    _ICON_HC_REL_PATH = "assets/icon_high_contrast.ico"
 
     # ---------------------------------------------------------------------
     # Construction helpers
@@ -50,6 +51,9 @@ class TrayApp:
 
         self._icon: "pystray.Icon | None" = None
         self._thread: threading.Thread | None = None
+
+        # Task 44 – Accessibility: decide whether to prefer high-contrast icons
+        self._use_high_contrast: bool = bool(self._cfg.get("high_contrast_icons", False))
 
     # ------------------------------------------------------------------
     # Public API
@@ -105,12 +109,12 @@ class TrayApp:
         environments) a very small placeholder is generated on-the-fly and
         persisted so subsequent runs can reuse it.
         """
-        icon_path = resource_path(self._ICON_REL_PATH)
-        icon_path.parent.mkdir(parents=True, exist_ok=True)
+        icon_path = self._get_icon_path()
 
         if not icon_path.exists():
-            logging.info("icon.ico not found – generating placeholder icon…")
-            self._create_placeholder_icon(icon_path)
+            # Generate placeholder matching the requested theme
+            logging.info("Tray icon not found – generating placeholder (%s)…", "HC" if self._use_high_contrast else "default")
+            self._create_placeholder_icon(icon_path, high_contrast=self._use_high_contrast)
 
         # **pystray** accepts either a PIL.Image or an ICO *file path* – we use
         # the former to avoid file-handle lifetime issues on Windows.
@@ -165,27 +169,47 @@ class TrayApp:
     # ------------------------------------------------------------------
     # Helper graphics routines
     # ------------------------------------------------------------------
-    def _create_placeholder_icon(self, out_path: Path) -> None:
-        """Generate a minimal .ico with *16×16* & *32×32* green-circle assets."""
-        img = self._create_fallback_image()
+    def _create_placeholder_icon(self, out_path: Path, *, high_contrast: bool = False) -> None:
+        """Generate a minimal .ico with *16×16* & *32×32* assets.
+
+        When *high_contrast* is *True* the icon uses a **yellow** (#FFFF00)
+        circle on a **black** background – a colour scheme optimised for the
+        Windows *High Contrast Black* theme.  Otherwise the original *green*
+        icon is generated.
+        """
+        img = self._create_fallback_image(high_contrast=high_contrast)
         sizes = [(16, 16), (32, 32)]
         img.save(out_path, format="ICO", sizes=sizes)
 
-    def _create_fallback_image(self, size: int = 64) -> Image.Image:
-        """Return an in-memory green circle placeholder *PIL.Image*."""
+    def _create_fallback_image(self, size: int = 64, *, high_contrast: bool = False) -> Image.Image:
+        """Return an in-memory placeholder *PIL.Image*.
+
+        Colours differ based on *high_contrast* flag to ensure sufficient
+        contrast ratio as per WCAG guidelines.
+        """
         img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         # Draw green circle
-        draw.ellipse([(4, 4), (size - 4, size - 4)], fill="#00AA00")
-        # Overlay white *IS* text in the centre for quick visual ID
+        circle_color = "#FFFF00" if high_contrast else "#00AA00"  # Yellow vs green
+        draw.ellipse([(4, 4), (size - 4, size - 4)], fill=circle_color)
+
         try:
             font = ImageFont.load_default()
             text = "IS"
+            text_fill = "#000000" if high_contrast else "white"
             w, h = draw.textsize(text, font=font)  # type: ignore[attr-defined]
-            draw.text(((size - w) / 2, (size - h) / 2), text, font=font, fill="white")
+            draw.text(((size - w) / 2, (size - h) / 2), text, font=font, fill=text_fill)
         except Exception:  # pragma: no cover – font issues
             pass
         return img
+
+    # ------------------------------------------------------------------
+    # Helper – decide icon path based on config / environment
+    # ------------------------------------------------------------------
+    def _get_icon_path(self) -> Path:
+        """Return the resolved :class:`pathlib.Path` for the tray icon."""
+        rel_path = self._ICON_HC_REL_PATH if self._use_high_contrast else self._ICON_REL_PATH
+        return resource_path(rel_path)
 
     # ------------------------------------------------------------------
     # Task 33 – VRAM badge helper

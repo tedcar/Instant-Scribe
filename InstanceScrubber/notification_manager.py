@@ -128,6 +128,14 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
         if copy_enabled:
             toast.on_activated = lambda: self._copy_to_clipboard(text)
 
+        # Task 44 – Accessibility: provide additional text attribute for screen readers
+        # Many Windows assistive technologies rely on the *attribution_text*
+        # field when available to present context about the notification.  We
+        # populate it with the same title ensuring Narrator announces
+        # "Transcription complete" regardless of toast template variations.
+        if hasattr(toast, "attribution_text"):
+            toast.attribution_text = self._DEFAULT_TITLE
+
         # --- Display ----------------------------------------------------------
         try:
             self._toaster.show_toast(toast)  # type: ignore[arg-type]
