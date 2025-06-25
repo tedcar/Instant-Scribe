@@ -34,9 +34,21 @@ import shutil
 import subprocess
 import sys
 import textwrap
+from pathlib import Path
 from typing import Final
 import signal as _signal  # local alias to avoid polluting global namespace
 import logging
+
+# Add the project root to sys.path to import portable_mode
+_script_dir = Path(__file__).resolve().parent
+_project_root = _script_dir.parent
+sys.path.insert(0, str(_project_root))
+
+try:
+    from instant_scribe import portable_mode
+except ImportError:
+    # Fallback for when running outside the project structure
+    portable_mode = None
 
 # ---------------------------------------------------------------------------
 # Global logging – written to *system_check.log* for self-healing diagnostics
@@ -233,10 +245,53 @@ def _require_nvidia_driver() -> None:
         raise CheckError(f"Failed to query NVIDIA driver version via nvidia-smi: {exc}") from exc
 
 
+def _check_portable_mode() -> None:
+    """Check and report portable mode status and resource locations."""
+    if portable_mode is None:
+        _print_ok("Portable mode detection: Not available (running outside project)")
+        return
+
+    if portable_mode.is_portable_mode():
+        _print_ok("Running in PORTABLE MODE")
+
+        # Verify portable directories and resources
+        executable_dir = portable_mode.get_executable_directory()
+        data_dir = portable_mode.get_portable_data_directory()
+
+        _print_ok(f"Executable directory: {executable_dir}")
+        _print_ok(f"Data directory: {data_dir}")
+
+        # Ensure portable directories exist
+        try:
+            portable_mode.ensure_portable_directories()
+            _print_ok("Portable directories created/verified")
+        except Exception as exc:
+            raise CheckError(f"Failed to create portable directories: {exc}") from exc
+
+        # Check for required resources relative to executable
+        required_files = ["assets/icon.ico"]
+        for file_path in required_files:
+            full_path = executable_dir / file_path
+            if full_path.exists():
+                _print_ok(f"Resource found: {file_path}")
+            else:
+                logging.warning(f"Resource not found: {file_path} at {full_path}")
+                # Don't fail for missing resources in development mode
+                if getattr(sys, "frozen", False):
+                    raise CheckError(f"Required resource missing: {file_path}")
+    else:
+        _print_ok("Running in STANDARD MODE (system installation)")
+
+        # Check standard system paths
+        config_path = portable_mode.get_config_path()
+        _print_ok(f"Config path: {config_path.parent}")
+
+
 def main() -> None:  # noqa: D401 – simple glue function
     failures: list[str] = []
 
     checks = [
+        _check_portable_mode,    # Task-46: Check portable mode and resource locations
         _require_nvidia_driver,  # Task-26: NVIDIA driver must be present first.
         lambda: _require_python((3, 10)),
         _require_pytorch_and_cuda,

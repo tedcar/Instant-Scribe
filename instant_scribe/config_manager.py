@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from . import portable_mode
+
 
 class ConfigManager:
     """Simple JSON-backed configuration loader / saver.
@@ -60,6 +62,11 @@ class ConfigManager:
     # ------------------------------------------------------------------
     def _resolve_config_path(self) -> Path:
         """Compute platform-appropriate path for the JSON config."""
+        # Check for portable mode first
+        if portable_mode.is_portable_mode():
+            return portable_mode.get_config_path(self.app_name)
+
+        # Standard system paths
         if os.name == "nt":
             # Use %APPDATA% on Windows.
             base_dir = Path(os.environ.get("APPDATA", Path.home()))

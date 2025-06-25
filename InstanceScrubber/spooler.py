@@ -12,9 +12,17 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 from typing import Final
+
+# Import portable mode utilities
+try:
+    from instant_scribe import portable_mode
+except ImportError:
+    # Fallback for when running outside the project structure
+    portable_mode = None
 
 __all__ = [
     "AudioSpooler",
@@ -170,6 +178,11 @@ class AudioSpooler:  # pylint: disable=too-few-public-methods
     @classmethod
     def _get_temp_dir(cls) -> Path:
         """Return the *Path* to the canonical temporary spool directory."""
+        # Check for portable mode first
+        if portable_mode and portable_mode.is_portable_mode():
+            return portable_mode.get_temp_directory()
+
+        # Standard system paths
         appdata = os.getenv("APPDATA")  # Windows hosts
         if appdata:
             base = Path(appdata)

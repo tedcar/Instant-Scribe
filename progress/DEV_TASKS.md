@@ -269,8 +269,8 @@
 - [x] 45.2 Detect DPI changes at runtime and reload icon without app restart.
 
 ## 46  Portable Mode Distribution
-- [ ] 46.1 Provide ZIP-based portable build skipping registry writes (depends on Task 15 Packaging).
-- [ ] 46.2 Update `system_check.py` to locate resources relative to executable in portable mode.
+- [x] 46.1 Provide ZIP-based portable build skipping registry writes (depends on Task 15 Packaging). (commit: task46-portable-mode)
+- [x] 46.2 Update `system_check.py` to locate resources relative to executable in portable mode. (commit: task46-portable-mode)
 
 ## 47  GPU Capability Fallback
 - [ ] 47.1 Detect GPUs with < 3 GB free VRAM; display blocking notification advising unsupported hardware.

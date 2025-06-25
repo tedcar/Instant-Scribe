@@ -31,6 +31,8 @@ from typing import Type
 
 from logging.handlers import RotatingFileHandler
 
+from . import portable_mode
+
 __all__ = [
     "install",
     "generate_report_zip",
@@ -44,9 +46,10 @@ _MAX_BYTES = int(os.getenv("INSTANT_SCRIBE_CRASH_MAX_BYTES", str(1 * 1024 * 1024
 _BACKUP_COUNT = int(os.getenv("INSTANT_SCRIBE_CRASH_BACKUP_COUNT", "10"))
 _LOG_PATH = Path(os.getenv("INSTANT_SCRIBE_CRASH_LOG", "logs/crash.log"))
 
-# Reports directory defaults to *%APPDATA%/Instant Scribe/reports* on Windows
-# or to *~/.instant_scribe/reports* on other platforms/CI runners.
-if os.name == "nt":
+# Reports directory – portable mode aware
+if portable_mode.is_portable_mode():
+    _REPORTS_DIR = portable_mode.get_data_path("reports")
+elif os.name == "nt":
     _REPORTS_DIR = Path(os.getenv("APPDATA", Path.home())) / "Instant Scribe" / "reports"
 else:  # pragma: no cover – non-Windows fallback for CI
     _REPORTS_DIR = Path.home() / ".instant_scribe" / "reports"
