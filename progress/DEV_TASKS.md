@@ -273,12 +273,12 @@
 - [x] 46.2 Update `system_check.py` to locate resources relative to executable in portable mode. (commit: task46-portable-mode)
 
 ## 47  GPU Capability Fallback
-- [ ] 47.1 Detect GPUs with < 3 GB free VRAM; display blocking notification advising unsupported hardware.
-- [ ] 47.2 Add CLI flag `--cpu-mode` for future research but keep hard-disabled in v1.0 (logged warning).
+- [x] 47.1 Detect GPUs with < 3 GB free VRAM; display blocking notification advising unsupported hardware. (commit: task47-gpu-capability-fallback)
+- [x] 47.2 Add CLI flag `--cpu-mode` for future research but keep hard-disabled in v1.0 (logged warning). (commit: task47-gpu-capability-fallback)
 
 ## 48  Dependency Auto-Update Service
-- [ ] 48.1 Weekly background job checks PyPI for security patches to pinned dependencies (depends on Task 27).
-- [ ] 48.2 Open automated PRs with updated `requirements.in` & `requirements.txt`; assign `security` label.
+- [x] 48.1 Weekly background job checks PyPI for security patches to pinned dependencies (depends on Task 27). (commit: task48-dependency-auto-update)
+- [x] 48.2 Open automated PRs with updated `requirements.in` & `requirements.txt`; assign `security` label. (commit: task48-dependency-auto-update)
 
 ## 49  Compliance & Data Residency
 - [ ] 49.1 Add config option allowing users to relocate archive directory to non-system drive.
@@ -288,9 +288,9 @@
 - [ ] 50.1 Externalise user-visible strings to `locale/en_US.json`.
 - [ ] 50.2 Provide sample `es_ES.json`; implement runtime language switch via config (depends on Task 9 Notifications).
 
-## 51  Background-Agent Metadata
-- [ ] 51.1 Encode task dependency graph in `metadata/tasks.yaml` for Cursor background-agent scheduling.
-- [ ] 51.2 CI checks that any new tasks include `depends_on` field.
+## 51  Background-Agent Metadata (Deleted Task)
+- [ NO ] 51.1 Encode task dependency graph in `metadata/tasks.yaml` for Cursor background-agent scheduling.
+- [ NO ] 51.2 CI checks that any new tasks include `depends_on` field.
 
 ## 52  Concurrent Batch Transcription Pipeline
 - [ ] 52.1 Refactor worker to transcribe batches asynchronously using `asyncio` (depends on Task 6).

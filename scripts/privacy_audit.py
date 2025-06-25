@@ -78,7 +78,7 @@ def _scan_file(path: pathlib.Path) -> List[str]:
 
 def _iter_python_files(root_dir: pathlib.Path) -> List[pathlib.Path]:
     """Yield *.py* files under *root_dir* excluding irrelevant folders."""
-    SKIP_KEYWORDS = {"tests", ".venv", "site-packages", "dist-packages", "__pycache__"}
+    SKIP_KEYWORDS = {"tests", ".venv", "site-packages", "dist-packages", "__pycache__", "scripts"}
     return [
         p
         for p in root_dir.rglob("*.py")

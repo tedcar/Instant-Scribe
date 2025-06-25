@@ -42,3 +42,6 @@ hypothesis>=6.100.0
 
 # Documentation generator (Task 41)
 pdoc3>=0.10.0
+
+# Security dependency scanning (Task 48)
+pip-audit>=2.9.0
