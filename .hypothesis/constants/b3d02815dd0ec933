@@ -1,0 +1,4 @@
+# file: C:\Users\sprit\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\tray_app.py
+# hypothesis_version: 6.135.14
+
+[5.0, 255, 256, '#00AA00', '#AA0000', '#FFFF00', 'Exit', 'ICO', 'IS', 'Instant Scribe', 'Instant Scribe STT', 'RGBA', 'Start Listening', 'Stop Listening', 'TrayApp', '_DPI_CHECK_INTERVAL', 'assets/icon.ico', 'black', 'high_contrast_icons', 'pystray.Icon | None', 'pystray.Menu', 'white']

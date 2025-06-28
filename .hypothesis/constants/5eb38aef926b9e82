@@ -1,0 +1,4 @@
+# file: C:\Users\sprit\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\clipboard_manager.py
+# hypothesis_version: 6.135.14
+
+[0.1, 8192, 4294967295, '.txt', '[^0-9A-Za-z_-]', '\\s+', '_', 'clip_fallback', 'pyperclip', 'utf-8', 'w']

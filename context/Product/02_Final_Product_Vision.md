@@ -1,3 +1,4 @@
+
 The Final Product Vision: A Portrait of "Instant Scribe"
 Part I: The Philosophy of a Lifelong, Invisible Utility
 "Instant Scribe" is not an application you consciously run; it is a fundamental, integrated capability of your Windows 10 system. Its design philosophy is forged from three core tenets: unyielding longevity, absolute minimalism, and unimpeachable reliability. It is conceived as a "set it and forget it" utility—a permanent component of your digital life, engineered to be installed once and to function flawlessly for decades.

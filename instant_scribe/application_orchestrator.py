@@ -41,6 +41,7 @@ from InstanceScrubber.spooler import AudioSpooler  # NEW – Task 12
 from InstanceScrubber.silence_pruner import prune_pcm_bytes
 from InstanceScrubber.gpu_monitor import GPUResourceMonitor
 from InstanceScrubber.telemetry_manager import TelemetryManager  # NEW – Task 43
+from InstanceScrubber.i18n_manager import initialize_i18n  # NEW – Task 50
 
 __all__ = [
     "ApplicationOrchestrator",
@@ -90,6 +91,9 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
     def __init__(self, *, use_stub_worker: bool = False, auto_start: bool = False, force_recover: bool = False):
         self._log = logging.getLogger(self.__class__.__name__)
 
+        # Store configuration flags
+        self._use_stub_worker = use_stub_worker
+
         # Public-ish state toggled by UI callbacks / tests
         self.is_listening: bool = False
         self._is_running: bool = False
@@ -97,6 +101,8 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
         # Core singletons -------------------------------------------------
         self.config = ConfigManager()
+        # Task 50 – Initialize i18n system with config
+        initialize_i18n(self.config)
         # Dynamically resolve components so *pytest* monkeypatches are honoured
         AudioStreamerCls = importlib.import_module("InstanceScrubber.audio_listener").AudioStreamer
         HotkeyManagerCls = importlib.import_module("InstanceScrubber.hotkey_manager").HotkeyManager
@@ -188,6 +194,21 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
         # Task 33 – GPU VRAM monitoring
         self.gpu_monitor = GPUResourceMonitor(self, self.config, self.notification_manager)
 
+        # Task 53 – VRAM overlay
+        try:
+            from InstanceScrubber.vram_overlay import VRAMOverlay
+            self.vram_overlay = VRAMOverlay(self.gpu_monitor)
+        except ImportError:  # pragma: no cover – headless CI path
+            self.vram_overlay = None
+
+        # VRAM overlay hotkey (Ctrl+Alt+F7)
+        vram_overlay_cfg_adapter = _ConfigKeyAdapter(self.config, "vram_overlay_hotkey")
+        self.vram_overlay_hotkey_manager = _safe_init(
+            HotkeyManagerCls,
+            vram_overlay_cfg_adapter,
+            on_activate=self._toggle_vram_overlay,
+        )
+
         # Task 12 & 24 – persistent audio spooler with configurable chunk interval
         self.spooler = AudioSpooler(
             chunk_interval_sec=int(self.config.get("spooler_chunk_interval_sec", 60))
@@ -236,6 +257,13 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
         self._log.info("Application starting …")
 
+        # Task 47.1 – Check GPU capability before starting GPU-heavy operations
+        if not self._use_stub_worker:  # Skip GPU check for stub workers (tests/CI)
+            from InstanceScrubber.gpu_capability_checker import check_gpu_capability_blocking
+            if not check_gpu_capability_blocking():
+                self._log.critical("GPU capability check failed – application cannot start")
+                sys.exit(1)
+
         # Spawn transcription worker (GPU heavy – do first).
         self.worker.start()
 
@@ -259,6 +287,13 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                 self._log.warning("Pause hotkey unavailable – user must rely on tray UI")
         except Exception as exc:  # pylint: disable=broad-except
             self._log.debug("Pause hotkey init error: %s", exc)
+
+        # Start the VRAM overlay hotkey (Task 53)
+        try:
+            if not self.vram_overlay_hotkey_manager.start():
+                self._log.warning("VRAM overlay hotkey unavailable – overlay must be managed via UI/API")
+        except Exception as exc:  # pylint: disable=broad-except
+            self._log.debug("VRAM overlay hotkey init error: %s", exc)
 
         try:
             if not self.tray_app.start():
@@ -316,6 +351,18 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
 
         try:
             self.pause_hotkey_manager.stop()
+        except Exception:
+            pass
+
+        try:
+            self.vram_overlay_hotkey_manager.stop()
+        except Exception:
+            pass
+
+        # Task 53 – Hide VRAM overlay
+        try:
+            if self.vram_overlay:
+                self.vram_overlay.hide()
         except Exception:
             pass
 
@@ -525,6 +572,21 @@ class ApplicationOrchestrator:  # pylint: disable=too-many-instance-attributes
                 except Exception as exc:  # pylint: disable=broad-except
                     self._log.error("Unable to pause recording: %s", exc)
 
+    # .................................................................
+    def _toggle_vram_overlay(self) -> None:  # noqa: D401 – imperative API
+        """Callback bound to *Ctrl+Alt+F7* – toggle VRAM overlay visibility."""
+
+        if not self.vram_overlay:
+            self._log.warning("VRAM overlay not available")
+            return
+
+        try:
+            self.vram_overlay.toggle_visibility()
+            state = "shown" if self.vram_overlay.is_visible else "hidden"
+            self._log.info("VRAM overlay %s", state)
+        except Exception as exc:  # pylint: disable=broad-except
+            self._log.error("Error toggling VRAM overlay: %s", exc)
+
     # ------------------------------------------------------------------
     # Task 33 – GPU auto-unload helpers
     # ------------------------------------------------------------------
@@ -584,8 +646,21 @@ def main() -> None:  # noqa: D401 – script entry
         action="store_true",
         help="Run with stub (CPU-only) transcription worker – useful for tests.",
     )
+    parser.add_argument(
+        "--cpu-mode",
+        action="store_true",
+        help="Enable CPU-only mode (DISABLED in v1.0 - for future research only).",
+    )
 
     args = parser.parse_args()
+
+    # Task 47.2 – CPU mode flag validation (hard-disabled in v1.0)
+    if args.cpu_mode:
+        logging.warning(
+            "CPU mode requested via --cpu-mode flag but is DISABLED in v1.0. "
+            "This flag is reserved for future research. GPU mode will be used instead."
+        )
+        # Note: We don't exit here, just log the warning and continue with GPU mode
 
     orchestrator = ApplicationOrchestrator(
         use_stub_worker=args.stub_worker,

@@ -1,0 +1,78 @@
+{
+  "app_name": "Instant Scribe",
+  "app_title": "Instant Scribe STT",
+  
+  "notifications": {
+    "transcription_complete": "Transcription complete",
+    "model_loaded": "Model loaded and ready.",
+    "model_unloaded": "Model unloaded from VRAM.",
+    "recording_paused": "Recording paused.",
+    "recording_resumed": "Recording resumed.",
+    "recovery_title": "Instant Scribe – Recovery",
+    "recovery_message": "An incomplete recording was found. Re-launch with --recover to resume.",
+    "critical_notification": "Critical System Notification",
+    "model_status": "Instant Scribe - Model Status",
+    "recording_status": "Instant Scribe - Recording Status",
+    "recovery_status": "Instant Scribe - Recovery"
+  },
+  
+  "tray_menu": {
+    "status_listening": "Status: Listening",
+    "status_idle": "Status: Idle",
+    "stop_listening": "Stop Listening",
+    "start_listening": "Start Listening",
+    "exit": "Exit"
+  },
+  
+  "system_messages": {
+    "tray_icon_started": "System-tray icon started.",
+    "tray_icon_failed": "Failed to start tray icon: {error}",
+    "icon_not_found": "icon.ico not found – generating placeholder icon…",
+    "icon_fallback": "Falling back to in-memory icon: {error}",
+    "dpi_change_detected": "DPI change detected: {old_dpi} → {new_dpi}",
+    "dpi_monitoring_error": "DPI monitoring error: {error}",
+    "icon_reload_failed": "Icon reload failed: {error}",
+    "listening_stopped": "Listening stopped via user toggle",
+    "windows_toast_unavailable": "Windows toast notifications unavailable: {error}",
+    "toast_runtime_error": "Disabling toast support – runtime error: {error}",
+    "toast_suppressed": "Toast suppressed (not supported). Body: {message}",
+    "toast_shown": "Toast shown successfully",
+    "toast_failed": "Failed to display toast: {error}",
+    "blocking_notification": "Blocking notification: {title} - {message}",
+    "blocking_toast_failed": "Failed to display blocking toast: {error}",
+    "clipboard_unavailable": "Clipboard unavailable – payload written to fallback file instead",
+    "clipboard_failed": "Clipboard handling failed: {error}"
+  },
+  
+  "console_messages": {
+    "press_enter_to": "Press Enter to {action}...",
+    "separator_line": "="
+  },
+  
+  "placeholders": {
+    "icon_text": "IS"
+  },
+  
+  "colors": {
+    "green_circle": "#00AA00",
+    "red_circle": "#AA0000",
+    "yellow_circle": "#FFFF00",
+    "black_background": "#000000",
+    "white_text": "white",
+    "black_text": "black"
+  },
+  
+  "cli": {
+    "description": "Instant Scribe launcher",
+    "recover_help": "Force recovery prompt even if no incomplete session detected.",
+    "stub_worker_help": "Run with stub (CPU-only) transcription worker – useful for tests.",
+    "cpu_mode_help": "Enable CPU-only mode (DISABLED in v1.0 - for future research only)."
+  },
+  
+  "errors": {
+    "pystray_unavailable": "pystray not available – tray UI disabled",
+    "unexpected_gui_failure": "Unexpected GUI failure",
+    "filesystem_error": "Filesystem error",
+    "runtime_environment_error": "Runtime environment error"
+  }
+}

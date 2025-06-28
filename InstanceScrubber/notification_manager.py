@@ -17,6 +17,9 @@ Core features (Task 9):
 from typing import Callable, Optional
 import logging
 
+# Task 50 – Import i18n support
+from .i18n_manager import get_text as _
+
 # ---------------------------------------------------------------------------
 # Optional Windows-specific dependencies
 # ---------------------------------------------------------------------------
@@ -39,12 +42,14 @@ __all__ = ["NotificationManager"]
 class NotificationManager:  # pylint: disable=too-few-public-methods
     """Runtime helper responsible for user-visible notifications."""
 
-    #: Default title shown for finished transcriptions
-    _DEFAULT_TITLE = "Transcription complete"
+    #: Default title shown for finished transcriptions (now localized)
+    @property
+    def _DEFAULT_TITLE(self) -> str:
+        return _("notifications.transcription_complete")
 
     def __init__(
         self,
-        app_name: str = "Instant Scribe",
+        app_name: str | None = None,
         *,
         copy_on_click: bool | None = None,
         show_notifications: bool | None = None,
@@ -66,7 +71,8 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
         """
 
         self._log = logging.getLogger(self.__class__.__name__)
-        self._app_name = app_name
+        # Task 50 – Use localized app name
+        self._app_name = app_name or _("app_name")
         self._copy_on_click_default = copy_on_click
         self._show_notifications_default = show_notifications
 
@@ -76,7 +82,7 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             try:
                 # WindowsToaster may still raise if underlying WinRT APIs are
                 # inaccessible (e.g., running under Wine or Linux CI).
-                self._toaster = WindowsToaster(app_name)  # type: ignore[arg-type]
+                self._toaster = WindowsToaster(self._app_name)  # type: ignore[arg-type]
             except Exception as exc:  # pragma: no cover – runtime environment
                 self._log.info("Disabling toast support – runtime error: %s", exc)
                 self._toaster = None
@@ -154,11 +160,13 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             passed through verbatim.
         """
 
-        title = "Instant Scribe"
-        message = (
-            "Model loaded and ready." if state == "loaded" else "Model unloaded from VRAM."
-            if state == "unloaded" else str(state)
-        )
+        title = _("app_name")
+        if state == "loaded":
+            message = _("notifications.model_loaded")
+        elif state == "unloaded":
+            message = _("notifications.model_unloaded")
+        else:
+            message = str(state)
 
         if not self._toaster:
             self._log.debug("Toast suppressed (not supported). Body: %s", message)
@@ -178,7 +186,7 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
 
         # Task 44 – Accessibility: Add attribution text for screen readers
         if hasattr(toast, 'attribution_text'):
-            toast.attribution_text = "Instant Scribe - Model Status"
+            toast.attribution_text = _("notifications.model_status")
 
         try:
             self._toaster.show_toast(toast)  # type: ignore[arg-type]
@@ -199,8 +207,8 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
             *False* to indicate recording has resumed.
         """
 
-        title = "Instant Scribe"
-        message = "Recording paused." if paused else "Recording resumed."
+        title = _("app_name")
+        message = _("notifications.recording_paused") if paused else _("notifications.recording_resumed")
 
         if not self._toaster:
             # Headless / unsupported environment – log and bail out.
@@ -221,7 +229,7 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
 
         # Task 44 – Accessibility: Add attribution text for screen readers
         if hasattr(toast, 'attribution_text'):
-            toast.attribution_text = "Instant Scribe - Recording Status"
+            toast.attribution_text = _("notifications.recording_status")
 
         try:
             self._toaster.show_toast(toast)  # type: ignore[arg-type]
@@ -241,8 +249,8 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
         be initiated via the ``--recover`` CLI flag.
         """
 
-        title = "Instant Scribe – Recovery"
-        message = "An incomplete recording was found.  Re-launch with --recover to resume."
+        title = _("notifications.recovery_title")
+        message = _("notifications.recovery_message")
 
         if not self._toaster:
             self._log.warning(message)
@@ -262,12 +270,87 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
 
         # Task 44 – Accessibility: Add attribution text for screen readers
         if hasattr(toast, 'attribution_text'):
-            toast.attribution_text = "Instant Scribe - Recovery"
+            toast.attribution_text = _("notifications.recovery_status")
 
         try:
             self._toaster.show_toast(toast)  # type: ignore[arg-type]
         except Exception as exc:  # pragma: no cover – runtime path
             self._log.warning("Failed to display toast: %s", exc)
+
+    # ------------------------------------------------------------------
+    # Task 47 – GPU capability blocking notification
+    # ------------------------------------------------------------------
+
+    def show_blocking_notification(self, title: str, message: str, buttons: list[str] | None = None) -> None:
+        """Display a blocking notification for critical system issues.
+
+        This method is designed for critical notifications that require user
+        acknowledgment, such as unsupported hardware warnings. It falls back
+        to console output if toast notifications are unavailable.
+
+        Parameters
+        ----------
+        title
+            The notification title.
+        message
+            The notification message body.
+        buttons
+            List of button labels (currently ignored, for future enhancement).
+        """
+        # Log the critical message
+        self._log.error("Blocking notification: %s - %s", title, message)
+
+        if not self._toaster:
+            # Fallback to console output for headless environments
+            print(f"\n{title}")
+            print("=" * len(title))
+            print(message)
+            if buttons:
+                print(f"\nPress Enter to {buttons[0].lower()}...")
+                try:
+                    input()
+                except (EOFError, KeyboardInterrupt):
+                    pass
+            return
+
+        # Create toast notification
+        if Toast is None:
+            class _StubToast:  # pylint: disable=too-few-public-methods
+                def __init__(self):
+                    self.text_fields = []
+
+            toast = _StubToast()  # type: ignore[assignment]
+        else:
+            toast = Toast()  # type: ignore[call-arg]
+
+        toast.text_fields = [title, message]
+
+        # Task 44 – Accessibility: Add attribution text for screen readers
+        if hasattr(toast, 'attribution_text'):
+            toast.attribution_text = _("notifications.critical_notification")
+
+        try:
+            self._toaster.show_toast(toast)  # type: ignore[arg-type]
+            # For blocking behavior, also show console fallback
+            print(f"\n{title}: {message}")
+            if buttons:
+                print(f"Press Enter to {buttons[0].lower()}...")
+                try:
+                    input()
+                except (EOFError, KeyboardInterrupt):
+                    pass
+        except Exception as exc:  # pragma: no cover – runtime path
+            self._log.warning("Failed to display blocking toast: %s", exc)
+            # Fallback to console output
+            print(f"\n{title}")
+            print("=" * len(title))
+            print(message)
+            if buttons:
+                print(f"\nPress Enter to {buttons[0].lower()}...")
+                try:
+                    input()
+                except (EOFError, KeyboardInterrupt):
+                    pass
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -284,4 +367,4 @@ class NotificationManager:  # pylint: disable=too-few-public-methods
                     "Clipboard unavailable – payload written to fallback file instead",
                 )
         except Exception as exc:  # pragma: no cover – unexpected runtime error
-            logging.getLogger(__name__).warning("Clipboard handling failed: %s", exc) 
+            logging.getLogger(__name__).warning("Clipboard handling failed: %s", exc)

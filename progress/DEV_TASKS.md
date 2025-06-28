@@ -280,40 +280,40 @@
 - [x] 48.1 Weekly background job checks PyPI for security patches to pinned dependencies (depends on Task 27). (commit: task48-dependency-auto-update)
 - [x] 48.2 Open automated PRs with updated `requirements.in` & `requirements.txt`; assign `security` label. (commit: task48-dependency-auto-update)
 
-## 49  Compliance & Data Residency
-- [ ] 49.1 Add config option allowing users to relocate archive directory to non-system drive.
-- [ ] 49.2 Produce GDPR data-export script `scripts/gdpr_export.py` generating ZIP of all user data (depends on Task 13).
+## 49  Compliance & Data Residency ✅
+- [x] 49.1 Add config option allowing users to relocate archive directory to non-system drive.
+- [x] 49.2 Produce GDPR data-export script `scripts/gdpr_export.py` generating ZIP of all user data (depends on Task 13).
 
-## 50  Internationalisation & Localisation Framework
-- [ ] 50.1 Externalise user-visible strings to `locale/en_US.json`.
-- [ ] 50.2 Provide sample `es_ES.json`; implement runtime language switch via config (depends on Task 9 Notifications).
+## 50  Internationalisation & Localisation Framework ✅
+- [x] 50.1 Externalise user-visible strings to `locale/en_US.json`.
+- [x] 50.2 Provide sample `es_ES.json`; implement runtime language switch via config (depends on Task 9 Notifications).
 
 ## 51  Background-Agent Metadata (Deleted Task)
 - [ NO ] 51.1 Encode task dependency graph in `metadata/tasks.yaml` for Cursor background-agent scheduling.
 - [ NO ] 51.2 CI checks that any new tasks include `depends_on` field.
 
-## 52  Concurrent Batch Transcription Pipeline
-- [ ] 52.1 Refactor worker to transcribe batches asynchronously using `asyncio` (depends on Task 6).
-- [ ] 52.2 Benchmark throughput improvements; update baseline JSON (Task 29).
+## 52  Concurrent Batch Transcription Pipeline ✅
+- [x] 52.1 Refactor worker to transcribe batches asynchronously using `asyncio` (depends on Task 6).
+- [x] 52.2 Benchmark throughput improvements; update baseline JSON (Task 29).
 
 ## 53  Live VRAM Overlay
-- [ ] 53.1 Optional small on-screen overlay showing live VRAM usage (%); toggle via hotkey `Ctrl+Alt+F7`.
-- [ ] 53.2 Implementation reuses `pynvml` polling loop (depends on Task 33).
+- [x] 53.1 Optional small on-screen overlay showing live VRAM usage (%); toggle via hotkey `Ctrl+Alt+F7`.
+- [x] 53.2 Implementation reuses `pynvml` polling loop (depends on Task 33).
 
 ## 54  Structured Log Export
-- [ ] 54.1 Upgrade logging to JSON Lines format and rotate daily.
-- [ ] 54.2 Provide log viewer CLI `scripts/log_viewer.py` with time-range filtering.
+- [x] 54.1 Upgrade logging to JSON Lines format and rotate daily.
+- [x] 54.2 Provide log viewer CLI `scripts/log_viewer.py` with time-range filtering.
 
 ## 55  Crash Dump Processor
-- [ ] 55.1 Generate minidump on unhandled exception using `faulthandler` (depends on Task 32).
-- [ ] 55.2 Add PowerShell tool `scripts/dump_decoder.ps1` converting dumps to human-readable stack traces.
+- [x] 55.1 Generate minidump on unhandled exception using `faulthandler` (depends on Task 32).
+- [x] 55.2 Add PowerShell tool `scripts/dump_decoder.ps1` converting dumps to human-readable stack traces.
 
 ## 56  GPU Stress Test Harness
-- [ ] 56.1 Implement `benchmarks/gpu_stress.py` loading/unloading model 100×; fail if VRAM leak > 5 MB.
+- [x] 56.1 Implement `benchmarks/gpu_stress.py` loading/unloading model 100×; fail if VRAM leak > 5 MB.
 
 ## 57  Model Integrity Verification
-- [ ] 57.1 Verify Parakeet checkpoint SHA-256 after download; store in `model_manifest.json`.
-- [ ] 57.2 Abort startup if checksum mismatch; prompt re-download.
+- [x] 57.1 Verify Parakeet checkpoint SHA-256 after download; store in `model_manifest.json`.
+- [x] 57.2 Abort startup if checksum mismatch; prompt re-download.
 
 ## 58  Config Schema & Validation
 - [ ] 58.1 Define `config.schema.json` and validate user config at launch using `jsonschema`.

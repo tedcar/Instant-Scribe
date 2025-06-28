@@ -25,11 +25,14 @@ Design highlights
 from concurrent.futures import ThreadPoolExecutor, Future
 from typing import Dict, List, Optional
 import logging
+import asyncio
+import time
 
 from InstanceScrubber.transcription_worker import TranscriptionWorker, EngineResponse
 
 __all__ = [
     "BatchTranscriber",
+    "AsyncBatchTranscriber",  # Task 52 – async version
 ]
 
 
@@ -110,5 +113,195 @@ class BatchTranscriber:  # pylint: disable=too-few-public-methods
 
     def __exit__(self, exc_type, exc_value, traceback):  # noqa: D401 – context manager helper
         self.close()
+
+
+# Task 52 – Async Batch Transcription Implementation
+class AsyncBatchTranscriber:
+    """Asyncio-based batch transcriber for improved concurrent processing."""
+
+    def __init__(
+        self,
+        *,
+        batch_length_ms: int = 600_000,
+        overlap_ms: int = 0,
+        max_concurrent: int = 8,
+        use_stub: bool = False,
+    ) -> None:
+        """Initialize async batch transcriber.
+
+        Args:
+            batch_length_ms: Length of each batch in milliseconds
+            overlap_ms: Overlap between batches in milliseconds
+            max_concurrent: Maximum concurrent transcription operations
+            use_stub: Whether to use stub transcription for testing
+        """
+        self.batch_length_ms = batch_length_ms
+        self.overlap_ms = overlap_ms
+        self.max_concurrent = max_concurrent
+        self._use_stub = use_stub
+
+        self._seq: int = 0
+        self._pending_tasks: Dict[int, asyncio.Task] = {}
+        self._results: Dict[int, EngineResponse] = {}
+        self._worker: Optional[TranscriptionWorker] = None
+        self._semaphore: Optional[asyncio.Semaphore] = None
+
+        # Performance tracking
+        self._start_time = time.time()
+        self._total_processed = 0
+        self._total_processing_time = 0.0
+
+    async def start(self) -> None:
+        """Start the async transcription worker."""
+        if self._worker is None:
+            self._worker = TranscriptionWorker(use_stub=self._use_stub)
+            self._worker.start()
+            self._semaphore = asyncio.Semaphore(self.max_concurrent)
+            logging.info("Async batch transcriber started with max_concurrent=%d", self.max_concurrent)
+
+    async def stop(self) -> None:
+        """Stop the transcription worker and cancel pending tasks."""
+        # Cancel all pending tasks
+        for task in self._pending_tasks.values():
+            if not task.done():
+                task.cancel()
+
+        # Wait for tasks to complete or be cancelled
+        if self._pending_tasks:
+            await asyncio.gather(*self._pending_tasks.values(), return_exceptions=True)
+
+        # Stop the worker
+        if self._worker:
+            self._worker.stop(reason="async batch transcriber shutdown")
+            self._worker = None
+
+        logging.info("Async batch transcriber stopped")
+
+    async def submit_slice_async(self, audio_pcm: bytes) -> int:
+        """Submit audio slice for async transcription.
+
+        Args:
+            audio_pcm: Raw PCM audio data
+
+        Returns:
+            Sequence number for tracking this slice
+        """
+        if not self._worker or not self._semaphore:
+            raise RuntimeError("AsyncBatchTranscriber not started")
+
+        seq = self._seq
+        self._seq += 1
+
+        # Create async task for this slice
+        task = asyncio.create_task(self._transcribe_slice_async(seq, audio_pcm))
+        self._pending_tasks[seq] = task
+
+        logging.debug("Submitted async batch slice seq=%d (%d bytes)", seq, len(audio_pcm))
+        return seq
+
+    async def _transcribe_slice_async(self, seq: int, audio_pcm: bytes) -> EngineResponse:
+        """Transcribe a single slice asynchronously."""
+        async with self._semaphore:
+            start_time = time.time()
+
+            try:
+                # Run the blocking transcription in a thread pool
+                loop = asyncio.get_event_loop()
+                response = await loop.run_in_executor(
+                    None,  # Use default thread pool
+                    lambda: self._worker.transcribe(audio_pcm, timeout=30.0)
+                )
+
+                processing_time = time.time() - start_time
+                self._total_processing_time += processing_time
+                self._total_processed += 1
+
+                self._results[seq] = response
+                logging.debug("Async slice %d completed in %.2fs", seq, processing_time)
+
+                return response
+
+            except Exception as exc:
+                processing_time = time.time() - start_time
+                self._total_processing_time += processing_time
+
+                error_response = EngineResponse(ok=False, payload={"error": str(exc)})
+                self._results[seq] = error_response
+                logging.error("Async slice %d failed in %.2fs: %s", seq, processing_time, exc)
+
+                return error_response
+
+            finally:
+                # Clean up the task reference
+                self._pending_tasks.pop(seq, None)
+
+    async def finalise_async(self, timeout: Optional[float] = None) -> str:
+        """Wait for all slices to complete and return concatenated text.
+
+        Args:
+            timeout: Maximum time to wait for all slices to complete
+
+        Returns:
+            Concatenated transcription text
+        """
+        logging.info("Finalising async batch transcription – awaiting %d slices", len(self._pending_tasks))
+
+        # Wait for all pending tasks
+        if self._pending_tasks:
+            try:
+                if timeout:
+                    await asyncio.wait_for(
+                        asyncio.gather(*self._pending_tasks.values(), return_exceptions=True),
+                        timeout=timeout
+                    )
+                else:
+                    await asyncio.gather(*self._pending_tasks.values(), return_exceptions=True)
+            except asyncio.TimeoutError:
+                logging.warning("Async batch finalisation timed out")
+                # Cancel remaining tasks
+                for task in self._pending_tasks.values():
+                    if not task.done():
+                        task.cancel()
+
+        # Collect results in order
+        ordered_text: List[str] = []
+        for seq in sorted(self._results.keys()):
+            resp = self._results[seq]
+            if resp.ok:
+                ordered_text.append(str(resp.payload))
+            else:
+                logging.warning("Slice %d failed: %s", seq, resp.payload)
+                # Continue with empty string for failed slices
+                ordered_text.append("")
+
+        return " ".join(text for text in ordered_text if text)
+
+    def get_performance_stats(self) -> Dict[str, float]:
+        """Get performance statistics for benchmarking."""
+        elapsed_time = time.time() - self._start_time
+
+        return {
+            "total_processed": self._total_processed,
+            "total_processing_time": self._total_processing_time,
+            "elapsed_time": elapsed_time,
+            "average_processing_time": (
+                self._total_processing_time / self._total_processed
+                if self._total_processed > 0 else 0.0
+            ),
+            "throughput_slices_per_second": (
+                self._total_processed / elapsed_time
+                if elapsed_time > 0 else 0.0
+            ),
+            "pending_tasks": len(self._pending_tasks),
+            "completed_results": len(self._results),
+        }
+
+    # Async context manager support
+    async def __aenter__(self):
+        await self.start()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.stop()
         # Do *not* swallow exceptions.
         return False 

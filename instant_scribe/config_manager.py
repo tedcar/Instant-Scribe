@@ -32,6 +32,8 @@ class ConfigManager:
         # Task 25 – Pause / Resume workflow defaults
         "pause_hotkey": "ctrl+alt+c",
         "paused": False,
+        # Task 53 – VRAM overlay defaults
+        "vram_overlay_hotkey": "ctrl+alt+f7",
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:

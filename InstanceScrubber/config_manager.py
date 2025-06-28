@@ -4,6 +4,21 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+try:
+    import jsonschema
+    from jsonschema import Draft202012Validator
+    _JSONSCHEMA_AVAILABLE = True
+except ImportError:
+    jsonschema = None  # type: ignore
+    Draft202012Validator = None  # type: ignore
+    _JSONSCHEMA_AVAILABLE = False
+
+try:
+    from InstanceScrubber.resource_manager import resource_path
+    _RESOURCE_MANAGER_AVAILABLE = True
+except ImportError:
+    _RESOURCE_MANAGER_AVAILABLE = False
+
 
 class ConfigManager:
     """Simple JSON-backed configuration loader / saver.
@@ -40,12 +55,17 @@ class ConfigManager:
         "high_contrast_icons": False,  # Use high-contrast icon variants
         # Task 45 – high-DPI & multi-monitor support
         "dpi_check_interval_sec": 5,  # How often to check for DPI changes
+        # Task 50 – internationalization & localization
+        "locale": "en_US",  # Default locale
     }
 
     def __init__(self, app_name: str = "Instant Scribe") -> None:
         self.app_name = app_name
         self._config_path: Path = self._resolve_config_path()
         self.settings: Dict[str, Any] = {}
+        self._schema: Optional[Dict[str, Any]] = None
+        self._validator: Optional[Any] = None
+        self._load_schema()
         self._load()
 
     # ---------------------------------------------------------------------
@@ -53,6 +73,9 @@ class ConfigManager:
     # ---------------------------------------------------------------------
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         """Return the configuration value for *key*, or *default* if missing."""
+        # If no explicit default provided, use DEFAULTS
+        if default is None and key in self.DEFAULTS:
+            default = self.DEFAULTS[key]
         return self.settings.get(key, default)
 
     def set(self, key: str, value: Any, *, auto_save: bool = True) -> None:
@@ -65,9 +88,126 @@ class ConfigManager:
         """Force reload configuration from disk, discarding local changes."""
         self._load()
 
+    def validate_config(self, config_data: Dict[str, Any]) -> bool:
+        """Validate configuration data against the JSON schema.
+
+        Args:
+            config_data: Configuration dictionary to validate
+
+        Returns:
+            True if validation passes, False otherwise
+        """
+        if not _JSONSCHEMA_AVAILABLE or not self._validator:
+            logging.warning("JSON schema validation unavailable - skipping validation")
+            return True
+
+        try:
+            self._validator.validate(config_data)
+            return True
+        except jsonschema.ValidationError as exc:
+            logging.error("Configuration validation failed: %s", exc.message)
+            logging.debug("Validation error details: %s", exc)
+            return False
+        except Exception as exc:
+            logging.error("Unexpected error during config validation: %s", exc)
+            return False
+
+    def set_archive_directory(self, new_path: str | Path) -> bool:
+        """Set a new archive directory path and validate it.
+
+        Args:
+            new_path: The new archive directory path. Can contain environment variables.
+
+        Returns:
+            True if the path was successfully set and validated, False otherwise.
+
+        Raises:
+            ValueError: If the path is invalid or cannot be created.
+        """
+        import os
+        from pathlib import Path
+
+        # Expand environment variables and resolve path
+        expanded_path = os.path.expandvars(str(new_path))
+        resolved_path = Path(expanded_path).expanduser().resolve()
+
+        # Validate that we can create the directory
+        try:
+            resolved_path.mkdir(parents=True, exist_ok=True)
+            if not resolved_path.is_dir():
+                raise ValueError(f"Path exists but is not a directory: {resolved_path}")
+        except (OSError, PermissionError) as exc:
+            raise ValueError(f"Cannot create or access directory: {resolved_path}") from exc
+
+        # Test write permissions
+        test_file = resolved_path / ".instant_scribe_test"
+        try:
+            test_file.write_text("test", encoding="utf-8")
+            test_file.unlink()
+        except (OSError, PermissionError) as exc:
+            raise ValueError(f"No write permission for directory: {resolved_path}") from exc
+
+        # Store the original path (with env vars) for portability
+        self.set("archive_root", str(new_path))
+        return True
+
+    def set_locale(self, locale: str) -> bool:
+        """Set the application locale and update i18n system.
+
+        Args:
+            locale: Locale code (e.g., 'en_US', 'es_ES')
+
+        Returns:
+            True if locale was successfully set, False otherwise.
+        """
+        try:
+            # Import here to avoid circular imports
+            from .i18n_manager import set_locale
+
+            # Validate locale by attempting to set it
+            if set_locale(locale):
+                self.set("locale", locale)
+                return True
+            return False
+        except ImportError:
+            # i18n system not available, just store the setting
+            self.set("locale", locale)
+            return True
+
     # ------------------------------------------------------------------
     # Implementation details
     # ------------------------------------------------------------------
+    def _load_schema(self) -> None:
+        """Load and initialize the JSON schema for configuration validation."""
+        if not _JSONSCHEMA_AVAILABLE:
+            logging.debug("jsonschema library not available - schema validation disabled")
+            return
+
+        try:
+            # Try to load schema from bundled resource first
+            schema_path = None
+            if _RESOURCE_MANAGER_AVAILABLE:
+                try:
+                    schema_path = resource_path("config.schema.json")
+                except Exception:
+                    pass
+
+            # Fallback to local file
+            if not schema_path or not Path(schema_path).exists():
+                schema_path = Path(__file__).parent.parent / "config.schema.json"
+
+            if Path(schema_path).exists():
+                with open(schema_path, 'r', encoding='utf-8') as f:
+                    self._schema = json.load(f)
+                self._validator = Draft202012Validator(self._schema)
+                logging.debug("Configuration schema loaded successfully")
+            else:
+                logging.warning("Configuration schema file not found at %s", schema_path)
+        except Exception as exc:
+            logging.warning("Failed to load configuration schema: %s", exc)
+            self._schema = None
+            self._validator = None
+
     def _resolve_config_path(self) -> Path:
         """Compute platform-appropriate path for the JSON config."""
         # Prefer the *APPDATA* environment variable when set to provide
@@ -94,7 +234,20 @@ class ConfigManager:
         try:
             if self._config_path.exists():
                 with self._config_path.open("r", encoding="utf-8") as fh:
-                    self.settings = json.load(fh)
+                    loaded_settings = json.load(fh)
+
+                # Validate loaded configuration
+                if self.validate_config(loaded_settings):
+                    self.settings = loaded_settings
+                    logging.debug("Configuration loaded and validated successfully")
+                else:
+                    logging.warning("Configuration validation failed - using defaults")
+                    self.settings = self.DEFAULTS.copy()
+                    # Write corrected defaults back to disk
+                    try:
+                        self._write_to_disk(self.settings)
+                    except Exception as write_exc:
+                        logging.error("Unable to write corrected config: %s", write_exc)
             else:
                 self.settings = self.DEFAULTS.copy()
                 self._write_to_disk(self.settings)
@@ -109,6 +262,10 @@ class ConfigManager:
 
     def _save(self) -> None:
         """Persist current *settings* to disk."""
+        # Validate before saving
+        if not self.validate_config(self.settings):
+            logging.error("Configuration validation failed - not saving invalid config")
+            return
         self._write_to_disk(self.settings)
 
     def _write_to_disk(self, data: Dict[str, Any]) -> None:

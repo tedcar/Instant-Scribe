@@ -1,0 +1,4 @@
+# file: C:\Users\sprit\Documents\[01] Documents\[12] Apps\Instant Scribe\InstanceScrubber\telemetry_manager.py
+# hypothesis_version: 6.135.14
+
+[5000, 10000, 30000, 'MetricExportResult', 'a', 'event', 'instant_scribe', 'metrics', 'raw', 'recorded_events', 'service.name', 'telemetry_enabled', 'utf-8']

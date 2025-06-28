@@ -29,6 +29,33 @@ from typing import Any, List, Sequence, Tuple
 import numpy as np
 
 # ---------------------------------------------------------------------------
+# Stub classes for testing and fallback
+# ---------------------------------------------------------------------------
+
+class _StubHypothesis:  # pylint: disable=too-few-public-methods
+    """Very small stand-in replicating the bits of NeMo's Hypothesis API"""
+
+    def __init__(self, text: str):
+        self.text = text
+        self.timestamp = {"word": []}
+
+class _StubASRModel:  # pylint: disable=too-few-public-methods
+    """Fake ASR model exposing a *transcribe()* method matching NeMo."""
+
+    def transcribe(  # noqa: D401 – signature mirrors real API
+        self,
+        *,
+        audio: Sequence[np.ndarray] | None = None,
+        batch_size: int = 1,
+        timestamps: bool | None = None,
+        **_kwargs,
+    ) -> List[Any]:
+        """Return fixed results so tests are deterministic."""
+        if timestamps:
+            return [_StubHypothesis("hello world (detailed)") for _ in audio]  # type: ignore[arg-type]
+        return ["hello world" for _ in audio]  # type: ignore[arg-type]
+
+# ---------------------------------------------------------------------------
 # Internal helpers – optional NeMo import with graceful fallback
 # ---------------------------------------------------------------------------
 
@@ -41,30 +68,6 @@ try:
     import importlib
     nemo_asr = importlib.import_module("nemo.collections.asr")  # type: ignore
 except Exception:  # noqa: BLE001 – broad except on purpose; we fall back to stub
-
-    class _StubHypothesis:  # pylint: disable=too-few-public-methods
-        """Very small stand-in replicating the bits of NeMo's Hypothesis API"""
-
-        def __init__(self, text: str):
-            self.text = text
-            self.timestamp = {"word": []}
-
-    class _StubASRModel:  # pylint: disable=too-few-public-methods
-        """Fake ASR model exposing a *transcribe()* method matching NeMo."""
-
-        def transcribe(  # noqa: D401 – signature mirrors real API
-            self,
-            *,
-            audio: Sequence[np.ndarray] | None = None,
-            batch_size: int = 1,
-            timestamps: bool | None = None,
-            **_kwargs,
-        ) -> List[Any]:
-            """Return fixed results so tests are deterministic."""
-            if timestamps:
-                return [_StubHypothesis("hello world (detailed)") for _ in audio]  # type: ignore[arg-type]
-            return ["hello world" for _ in audio]  # type: ignore[arg-type]
-
     nemo_asr = None  # type: ignore
 
 # ---------------------------------------------------------------------------

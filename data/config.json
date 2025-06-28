@@ -1,0 +1,15 @@
+{
+    "hotkey": "ctrl+alt+f",
+    "model_hotkey": "ctrl+alt+f6",
+    "vad_aggressiveness": 2,
+    "silence_threshold_ms": 120000,
+    "silence_prune_threshold_ms": 120000,
+    "batch_length_ms": 600000,
+    "batch_overlap_ms": 10000,
+    "show_notifications": true,
+    "copy_to_clipboard_on_click": true,
+    "archive_root": "C:\\\\Users\\\\%USERNAME%\\\\Documents\\\\[01] Documents\\\\[15] AI Recordings",
+    "pause_hotkey": "ctrl+alt+c",
+    "paused": false,
+    "test_key": "test_value"
+}

@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instant-scribe.app/config.schema.json",
+  "title": "Instant Scribe Configuration Schema",
+  "description": "JSON Schema for validating Instant Scribe application configuration",
+  "type": "object",
+  "properties": {
+    "hotkey": {
+      "type": "string",
+      "description": "Global hotkey combination for start/stop recording",
+      "default": "ctrl+alt+f",
+      "pattern": "^((ctrl|alt|shift|win)\\+)+(ctrl|alt|shift|win|[a-z0-9]+)$",
+      "examples": ["ctrl+alt+f", "ctrl+shift+r", "alt+f1"]
+    },
+    "model_hotkey": {
+      "type": "string", 
+      "description": "Global hotkey combination for unload/reload model (VRAM management)",
+      "default": "ctrl+alt+f6",
+      "pattern": "^((ctrl|alt|shift|win)\\+)+(ctrl|alt|shift|win|[a-z0-9]+)$",
+      "examples": ["ctrl+alt+f6", "ctrl+shift+m"]
+    },
+    "pause_hotkey": {
+      "type": "string",
+      "description": "Global hotkey combination for pause/resume recording",
+      "default": "ctrl+alt+c",
+      "pattern": "^((ctrl|alt|shift|win)\\+)+(ctrl|alt|shift|win|[a-z0-9]+)$",
+      "examples": ["ctrl+alt+c", "ctrl+shift+p"]
+    },
+    "vram_overlay_hotkey": {
+      "type": "string",
+      "description": "Global hotkey combination for toggling VRAM overlay display",
+      "default": "ctrl+alt+f7",
+      "pattern": "^((ctrl|alt|shift|win)\\+)+(ctrl|alt|shift|win|[a-z0-9]+)$",
+      "examples": ["ctrl+alt+f7", "ctrl+shift+v"]
+    },
+    "vad_aggressiveness": {
+      "type": "integer",
+      "description": "Voice Activity Detection aggressiveness level (0=least aggressive, 3=most aggressive)",
+      "default": 2,
+      "minimum": 0,
+      "maximum": 3,
+      "examples": [0, 1, 2, 3]
+    },
+    "silence_threshold_ms": {
+      "type": "integer",
+      "description": "Duration of silence in milliseconds that signifies end of utterance",
+      "default": 120000,
+      "minimum": 100,
+      "maximum": 300000,
+      "examples": [700, 1000, 2000, 120000]
+    },
+    "silence_prune_threshold_ms": {
+      "type": "integer", 
+      "description": "Threshold for pruning long silence segments before transcription (milliseconds)",
+      "default": 120000,
+      "minimum": 1000,
+      "maximum": 600000,
+      "examples": [60000, 120000, 180000]
+    },
+    "batch_length_ms": {
+      "type": "integer",
+      "description": "Length of audio batches for parallel transcription processing (milliseconds)",
+      "default": 600000,
+      "minimum": 30000,
+      "maximum": 1800000,
+      "examples": [300000, 600000, 900000]
+    },
+    "batch_overlap_ms": {
+      "type": "integer",
+      "description": "Overlap between audio batches to ensure continuity (milliseconds)",
+      "default": 10000,
+      "minimum": 1000,
+      "maximum": 60000,
+      "examples": [5000, 10000, 15000]
+    },
+    "show_notifications": {
+      "type": "boolean",
+      "description": "Whether to show Windows toast notifications for transcription results",
+      "default": true
+    },
+    "copy_to_clipboard_on_click": {
+      "type": "boolean",
+      "description": "Whether to copy transcription text to clipboard when notification is clicked",
+      "default": true
+    },
+    "archive_root": {
+      "type": "string",
+      "description": "Root directory path for storing transcription archives (supports environment variables)",
+      "default": "C:\\\\Users\\\\%USERNAME%\\\\Documents\\\\[01] Documents\\\\[15] AI Recordings",
+      "examples": [
+        "C:\\\\Users\\\\%USERNAME%\\\\Documents\\\\Transcriptions",
+        "D:\\\\Audio Archives",
+        "%USERPROFILE%\\\\Desktop\\\\Recordings"
+      ]
+    },
+    "paused": {
+      "type": "boolean",
+      "description": "Current pause state of the application (persisted between sessions)",
+      "default": false
+    },
+    "spooler_chunk_interval_sec": {
+      "type": "integer",
+      "description": "Interval in seconds for writing audio chunks to disk during recording",
+      "default": 60,
+      "minimum": 10,
+      "maximum": 300,
+      "examples": [30, 60, 120]
+    },
+    "vram_unload_threshold_mb": {
+      "type": "integer",
+      "description": "Free VRAM threshold in MB below which model is automatically unloaded",
+      "default": 1024,
+      "minimum": 512,
+      "maximum": 8192,
+      "examples": [512, 1024, 2048]
+    },
+    "gpu_monitor_interval_sec": {
+      "type": "integer",
+      "description": "Polling interval in seconds for GPU resource monitoring",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 60,
+      "examples": [1, 5, 10]
+    },
+    "enable_agc": {
+      "type": "boolean",
+      "description": "Enable Automatic Gain Control for audio enhancement",
+      "default": false
+    },
+    "enable_noise_suppression": {
+      "type": "boolean",
+      "description": "Enable noise suppression for audio enhancement",
+      "default": false
+    },
+    "telemetry_enabled": {
+      "type": "boolean",
+      "description": "Enable optional runtime metrics collection (opt-out by default)",
+      "default": false
+    },
+    "high_contrast_icons": {
+      "type": "boolean",
+      "description": "Use high-contrast icon variants for accessibility",
+      "default": false
+    },
+    "dpi_check_interval_sec": {
+      "type": "integer",
+      "description": "Interval in seconds for checking DPI changes on multi-monitor setups",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 30,
+      "examples": [1, 5, 10]
+    },
+    "locale": {
+      "type": "string",
+      "description": "Application locale for internationalization",
+      "default": "en_US",
+      "pattern": "^[a-z]{2}_[A-Z]{2}$",
+      "examples": ["en_US", "es_ES", "fr_FR", "de_DE"]
+    }
+  },
+  "additionalProperties": false,
+  "required": []
+}

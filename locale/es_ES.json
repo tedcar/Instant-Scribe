@@ -1,0 +1,78 @@
+{
+  "app_name": "Instant Scribe",
+  "app_title": "Instant Scribe STT",
+  
+  "notifications": {
+    "transcription_complete": "Transcripción completada",
+    "model_loaded": "Modelo cargado y listo.",
+    "model_unloaded": "Modelo descargado de VRAM.",
+    "recording_paused": "Grabación pausada.",
+    "recording_resumed": "Grabación reanudada.",
+    "recovery_title": "Instant Scribe – Recuperación",
+    "recovery_message": "Se encontró una grabación incompleta. Reinicie con --recover para continuar.",
+    "critical_notification": "Notificación Crítica del Sistema",
+    "model_status": "Instant Scribe - Estado del Modelo",
+    "recording_status": "Instant Scribe - Estado de Grabación",
+    "recovery_status": "Instant Scribe - Recuperación"
+  },
+  
+  "tray_menu": {
+    "status_listening": "Estado: Escuchando",
+    "status_idle": "Estado: Inactivo",
+    "stop_listening": "Detener Escucha",
+    "start_listening": "Iniciar Escucha",
+    "exit": "Salir"
+  },
+  
+  "system_messages": {
+    "tray_icon_started": "Icono de bandeja del sistema iniciado.",
+    "tray_icon_failed": "Error al iniciar el icono de bandeja: {error}",
+    "icon_not_found": "icon.ico no encontrado – generando icono de marcador de posición…",
+    "icon_fallback": "Recurriendo al icono en memoria: {error}",
+    "dpi_change_detected": "Cambio de DPI detectado: {old_dpi} → {new_dpi}",
+    "dpi_monitoring_error": "Error de monitoreo de DPI: {error}",
+    "icon_reload_failed": "Error al recargar icono: {error}",
+    "listening_stopped": "Escucha detenida por el usuario",
+    "windows_toast_unavailable": "Notificaciones toast de Windows no disponibles: {error}",
+    "toast_runtime_error": "Deshabilitando soporte de toast – error de tiempo de ejecución: {error}",
+    "toast_suppressed": "Toast suprimido (no compatible). Contenido: {message}",
+    "toast_shown": "Toast mostrado exitosamente",
+    "toast_failed": "Error al mostrar toast: {error}",
+    "blocking_notification": "Notificación bloqueante: {title} - {message}",
+    "blocking_toast_failed": "Error al mostrar toast bloqueante: {error}",
+    "clipboard_unavailable": "Portapapeles no disponible – contenido escrito en archivo de respaldo",
+    "clipboard_failed": "Error en manejo del portapapeles: {error}"
+  },
+  
+  "console_messages": {
+    "press_enter_to": "Presione Enter para {action}...",
+    "separator_line": "="
+  },
+  
+  "placeholders": {
+    "icon_text": "IS"
+  },
+  
+  "colors": {
+    "green_circle": "#00AA00",
+    "red_circle": "#AA0000",
+    "yellow_circle": "#FFFF00",
+    "black_background": "#000000",
+    "white_text": "white",
+    "black_text": "black"
+  },
+  
+  "cli": {
+    "description": "Lanzador de Instant Scribe",
+    "recover_help": "Forzar solicitud de recuperación incluso si no se detecta sesión incompleta.",
+    "stub_worker_help": "Ejecutar con trabajador de transcripción stub (solo CPU) – útil para pruebas.",
+    "cpu_mode_help": "Habilitar modo solo CPU (DESHABILITADO en v1.0 - solo para investigación futura)."
+  },
+  
+  "errors": {
+    "pystray_unavailable": "pystray no disponible – interfaz de bandeja deshabilitada",
+    "unexpected_gui_failure": "Error inesperado de interfaz gráfica",
+    "filesystem_error": "Error del sistema de archivos",
+    "runtime_environment_error": "Error del entorno de tiempo de ejecución"
+  }
+}

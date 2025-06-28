@@ -16,6 +16,8 @@ except ImportError:  # pragma: no cover – unit-tests replace *pystray* with a 
 
 from InstanceScrubber.config_manager import ConfigManager
 from InstanceScrubber.resource_manager import resource_path
+# Task 50 – Import i18n support
+from InstanceScrubber.i18n_manager import get_text as _
 
 __all__ = ["TrayApp"]
 
@@ -76,8 +78,8 @@ class TrayApp:
             img = self._load_or_generate_icon()
             menu = self._build_menu()
             self._icon = pystray.Icon(
-                name="Instant Scribe",
-                title="Instant Scribe STT",
+                name=_("app_name"),
+                title=_("app_title"),
                 icon=img,
                 menu=menu,
             )
@@ -161,10 +163,10 @@ class TrayApp:
         from pystray import Menu as _Menu, MenuItem as _Item  # type: ignore
 
         def _status_text(_: object) -> str:  # noqa: D401 – callback signature
-            return f"Status: {'Listening' if self._is_listening else 'Idle'}"
+            return _("tray_menu.status_listening") if self._is_listening else _("tray_menu.status_idle")
 
         def _toggle_text(_: object) -> str:  # noqa: D401 – callback signature
-            return "Stop Listening" if self._is_listening else "Start Listening"
+            return _("tray_menu.stop_listening") if self._is_listening else _("tray_menu.start_listening")
 
         # The *enabled=False* attribute disables user interaction on the first
         # menu item (purely informational).
@@ -172,7 +174,7 @@ class TrayApp:
             _Item(_status_text, None, enabled=False),
             _Menu.SEPARATOR,
             _Item(_toggle_text, self._on_toggle),
-            _Item("Exit", self._on_exit),
+            _Item(_("tray_menu.exit"), self._on_exit),
         )
 
     # ..................................................................
@@ -232,7 +234,7 @@ class TrayApp:
         # Overlay *IS* text in the centre for quick visual ID
         try:
             font = ImageFont.load_default()
-            text = "IS"
+            text = _("placeholders.icon_text")
             w, h = draw.textsize(text, font=font)  # type: ignore[attr-defined]
             draw.text(((size - w) / 2, (size - h) / 2), text, font=font, fill=text_color)
         except Exception:  # pragma: no cover – font issues

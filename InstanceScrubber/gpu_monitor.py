@@ -95,9 +95,18 @@ class GPUResourceMonitor:
         try:
             mem = pynvml.nvmlDeviceGetMemoryInfo(self._handle)  # type: ignore[attr-defined]
             free_mb = mem.free / (1024 * 1024)
+            used_mb = mem.used / (1024 * 1024)
+            total_mb = mem.total / (1024 * 1024)
         except Exception as exc:  # pragma: no cover – NVML runtime error
             self._log.debug("nvmlDeviceGetMemoryInfo failed: %s", exc)
             return
+
+        # Task 53 – Update VRAM overlay if available
+        if hasattr(self._orch, 'vram_overlay') and self._orch.vram_overlay:
+            try:
+                self._orch.vram_overlay.update_vram_data(used_mb, total_mb)
+            except Exception as exc:  # pragma: no cover – robustness
+                self._log.debug("VRAM overlay update failed: %s", exc)
 
         threshold_mb = int(self._cfg.get("vram_unload_threshold_mb", 1024))
         if self._orch.model_loaded and free_mb < threshold_mb:
@@ -107,4 +116,4 @@ class GPUResourceMonitor:
             try:
                 self._orch.auto_unload_model()
             except Exception as exc:  # pragma: no cover – robustness
-                self._log.error("Auto-unload request failed: %s", exc) 
+                self._log.error("Auto-unload request failed: %s", exc)

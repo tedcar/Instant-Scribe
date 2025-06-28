@@ -1,0 +1,4 @@
+# file: C:\Users\sprit\Documents\[01] Documents\[12] Apps\Instant Scribe\instant_scribe\application_orchestrator.py
+# hypothesis_version: 6.135.14
+
+[120, 16000, 120000, '--recover', '--stub-worker', 'SIGTERM', 'Shutdown complete', 'Shutting down …', 'TracebackType | None', '__main__', 'a', 'app shutdown', 'enable_agc', 'hotkey', 'listening_started', 'listening_stopped', 'loaded', 'logs/crash.log', 'main', 'model_hotkey', 'pause_hotkey', 'paused', 'show_notifications', 'show_recovery_prompt', 'store_true', 'unloaded', 'update_vram_badge', 'utf-8']
